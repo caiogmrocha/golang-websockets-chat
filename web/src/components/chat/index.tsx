@@ -8,10 +8,32 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Message } from "./message"
+import { useState } from "react"
+
+interface Message {
+    owner: "sender" | "receiver"
+    text: string
+}
 
 export function Chat() {
+    const [messages, setMessages] = useState<Message[]>([
+        { owner: "receiver", text: "Hi, how can I help you today?" },
+        { owner: "sender", text: "What seems to be the problem?" },
+        { owner: "receiver", text: "Hey, I'm having trouble with my account." },
+        { owner: "sender", text: "I can't log in." },
+    ]);
+
+    const [currentMessage, setCurrentMessage] = useState("")
+
     function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault()
+
+        setMessages((prevMessages) => [
+            ...prevMessages,
+            { owner: "sender", text: currentMessage },
+        ])
+
+        setCurrentMessage("")
     }
 
     function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
@@ -27,17 +49,18 @@ export function Chat() {
             </CardHeader>
             <CardContent>
                 <div className="space-y-4">
-                    <Message owner="receiver">Hi, how can I help you today?</Message>
-                    <Message owner="sender">Hey, I'm having trouble with my account.</Message>
-                    <Message owner="receiver">What seems to be the problem?</Message>
-                    <Message owner="sender">I can't log in.</Message>
+                    {messages.map((message, index) => (
+                        <Message key={index} owner={message.owner}>
+                            {message.text}
+                        </Message>
+                    ))}
                 </div>
             </CardContent>
             <CardFooter className="flex justify-between">
                 <form onSubmit={handleSubmit}>
                     <div className="grid w-full items-center gap-4">
                         <div className="flex">
-                            <Input id="name" placeholder="Name of your project" onKeyDown={handleKeyDown}/>
+                            <Input id="name" placeholder="Name of your project" onKeyDown={handleKeyDown} onChange={(e) => setCurrentMessage(e.target.value)} value={currentMessage} />
                             <Button type="submit">Send</Button>
                         </div>
                     </div>
