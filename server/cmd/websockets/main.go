@@ -3,8 +3,10 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 
+	"github.com/google/uuid"
 	"github.com/olahol/melody"
 )
 
@@ -15,22 +17,42 @@ func main() {
 		m.HandleRequest(w, r)
 	})
 
-	// users := map[string]string{}
-	chats := map[string][]string{}
+	m.HandleConnect(func (s *melody.Session) {
+		log.Println("Connected")
+		
+		userId := uuid.New().String()
+
+		s.Set("user_id", userId)
+
+		responsePayload := map[string]interface{}{
+			"type": "user_id",
+			"user_id": userId,
+		}
+
+		marshalledPayload, _ := json.Marshal(responsePayload)
+
+		s.Write(marshalledPayload)
+
+		marshalledPayload, _ = json.Marshal(map[string]interface{}{
+			"type": "another_user_connected",
+			"user_id": userId,
+		})
+
+		m.BroadcastFilter(marshalledPayload, func (q *melody.Session) bool {
+			sId, _ := q.Get("user_id")
+			qId, _ := s.Get("user_id")
+
+			return sId != qId
+		})
+	})
 
 	m.HandleMessage(func (s *melody.Session, msg []byte) {
-		userId := s.Request.Header.Get("User-ID")
-		
 		var clientPayload map[string]interface{}
-
-		json.Unmarshal(msg, &clientPayload)
 		
-		chatKey := fmt.Sprintf("%s-%s", userId, clientPayload["receiver_id"])
-
-		s.Set(chatKey, true)
+		json.Unmarshal(msg, &clientPayload)
 
 		switch clientPayload["type"] {
-			case "sendMessage": {
+			case "message": {
 				sessions, err := m.Sessions()
 
 				if err != nil {
@@ -39,13 +61,11 @@ func main() {
 					return
 				}
 
-				chats[chatKey] = append(chats[chatKey], clientPayload["message"].(string))
-
 				for _, session := range sessions {
-					if session.Request.Header.Get("User-ID") == clientPayload["receiver_id"] {
+					if receiverId, exists := session.Get("user_id"); exists && receiverId == clientPayload["receiver_id"] {
 						responsePayload := map[string]interface{}{
 							"type": "message",
-							"sender_id": userId,
+							"sender_id": clientPayload["sender_id"],
 							"message": clientPayload["message"],
 						}
 
@@ -55,8 +75,43 @@ func main() {
 					}
 				}
 			}
+
+			case "users_ids": {
+				sessions, err := m.Sessions()
+
+				if err != nil {
+					fmt.Println(err)
+
+					return
+				}
+
+				usersIds := []string{}
+
+				for _, session := range sessions {
+					if userId, exists := session.Get("user_id"); exists {
+						usersIds = append(usersIds, userId.(string))
+					}
+				}
+
+				responsePayload := map[string]interface{}{
+					"type": "users_ids",
+					"users_ids": usersIds,
+				}
+
+				marshalledPayload, _ := json.Marshal(responsePayload)
+
+				s.Write(marshalledPayload)
+			}
 		}
+
+
 	})
 
-	http.ListenAndServe(":8080", nil)
+	log.Println("Server started on :8080")
+
+	err := http.ListenAndServe(":8080", nil)
+
+	if err != nil {
+		log.Fatal(err)
+	}
 }
