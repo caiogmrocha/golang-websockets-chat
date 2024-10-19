@@ -8,38 +8,127 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Message } from "./message"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 interface Message {
     owner: "sender" | "receiver"
-    text: string
+    message: string
 }
 
 export function Chat() {
-    const webSocket = new WebSocket("ws://localhost:8080/ws")
-
-    webSocket.addEventListener("open", () => {
-        console.log("Connected to the server")
-    })
-
     const [messages, setMessages] = useState<Message[]>([
-        { owner: "receiver", text: "Hi, how can I help you today?" },
-        { owner: "sender", text: "What seems to be the problem?" },
-        { owner: "receiver", text: "Hey, I'm having trouble with my account." },
-        { owner: "sender", text: "I can't log in." },
+        { owner: "receiver", message: "Hi, how can I help you today?" },
+        { owner: "sender", message: "What seems to be the problem?" },
+        { owner: "receiver", message: "Hey, I'm having trouble with my account." },
+        { owner: "sender", message: "I can't log in." },
     ]);
 
     const [currentMessage, setCurrentMessage] = useState("")
+    
+    const [userId, setUserId] = useState("")
+    const [usersIds, setUsersIds] = useState<string[]>([])
+
+    const [webSocket, setWebSocket] = useState<WebSocket | null>(null)
+
+    useEffect(() => {
+        let webSocket = new WebSocket("ws://localhost:8080/ws")
+
+        setWebSocket(webSocket)
+
+        function handleWebSocketOpen() {
+            console.log("Connected to the server")
+
+            webSocket.send(JSON.stringify({
+                type: "users_ids",
+            }))
+        }
+
+        function handleWebSocketMessage(event: MessageEvent) {
+            console.log("Message from the server:", event.data)
+
+            const data = JSON.parse(event.data)
+
+            switch (data.type) {
+                case "message": {
+                    if (data.type === "message") {
+                        setMessages((prevMessages) => [
+                            ...prevMessages,
+                            { owner: "receiver", message: data.message },
+                        ])
+                    }
+                } break;
+
+                case "user_id": {
+                    console.log("User ID:", data.user_id)
+
+                    setUserId(data.user_id)
+                } break;
+
+                case "users_ids": {
+                    console.log("User IDs:", data.users_ids)
+
+                    setUsersIds(data.users_ids)
+                } break;
+
+                case "another_user_connected": {
+                    console.log("Another user connected:", data.user_id)
+
+                    setUsersIds((prevUsersIds) => [
+                        ...prevUsersIds,
+                        data.user_id,
+                    ])
+                } break;
+
+                case "another_user_disconnected": {
+                    console.log("Another user disconnected:", data.user_id)
+
+                    setUsersIds((prevUsersIds) => prevUsersIds.filter((userId) => userId !== data.user_id))
+                } break;
+
+                default: {
+                    console.error("Unknown message type:", data.type)
+                }
+            }
+        }
+
+        function handleWebSocketClose() {
+            console.log("Disconnected from the server")
+        }
+
+        function handleWebSocketError(error: Event) {
+            console.error("An error occurred:", error)
+        }
+
+        webSocket.addEventListener("open", handleWebSocketOpen)
+        webSocket.addEventListener("message", handleWebSocketMessage)
+        webSocket.addEventListener("close", handleWebSocketClose)
+        webSocket.addEventListener("error", handleWebSocketError)
+
+        return () => {
+            webSocket.removeEventListener("open", handleWebSocketOpen)
+            webSocket.removeEventListener("message", handleWebSocketMessage)
+            webSocket.removeEventListener("close", handleWebSocketClose)
+            webSocket.removeEventListener("error", handleWebSocketError)
+            webSocket.close()
+        }
+    }, [])
 
     function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault()
 
         setMessages((prevMessages) => [
             ...prevMessages,
-            { owner: "sender", text: currentMessage },
+            { owner: "sender", message: currentMessage },
         ])
 
         setCurrentMessage("")
+
+        webSocket!.send(JSON.stringify({
+            type: "message",
+            message: currentMessage,
+            sender_id: userId,
+            receiver_id: usersIds.find((uid) => uid !== userId),
+        }))
     }
 
     function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
@@ -57,7 +146,7 @@ export function Chat() {
                 <div className="space-y-4">
                     {messages.map((message, index) => (
                         <Message key={index} owner={message.owner}>
-                            {message.text}
+                            {message.message}
                         </Message>
                     ))}
                 </div>
