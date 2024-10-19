@@ -16,6 +16,12 @@ interface Message {
 }
 
 export function Chat() {
+    const webSocket = new WebSocket("ws://localhost:8080/ws")
+
+    webSocket.addEventListener("open", () => {
+        console.log("Connected to the server")
+    })
+
     const [messages, setMessages] = useState<Message[]>([
         { owner: "receiver", text: "Hi, how can I help you today?" },
         { owner: "sender", text: "What seems to be the problem?" },
