@@ -46,6 +46,24 @@ func main() {
 		})
 	})
 
+	m.HandleDisconnect(func (s *melody.Session) {
+		log.Println("Disconnected")
+
+		userId, _ := s.Get("user_id")
+
+		marshalledPayload, _ := json.Marshal(map[string]interface{}{
+			"type": "another_user_disconnected",
+			"user_id": userId,
+		})
+
+		m.BroadcastFilter(marshalledPayload, func (q *melody.Session) bool {
+			sId, _ := q.Get("user_id")
+			qId, _ := s.Get("user_id")
+
+			return sId != qId
+		})
+	})
+
 	m.HandleMessage(func (s *melody.Session, msg []byte) {
 		var clientPayload map[string]interface{}
 		
