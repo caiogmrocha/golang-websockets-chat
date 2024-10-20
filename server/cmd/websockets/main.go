@@ -2,11 +2,10 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 
-	"github.com/google/uuid"
+	"github.com/caiogmrocha/golang-websockets-chat/internal/controller/ws"
 	"github.com/olahol/melody"
 )
 
@@ -17,112 +16,20 @@ func main() {
 		m.HandleRequest(w, r)
 	})
 
-	m.HandleConnect(func (s *melody.Session) {
-		log.Println("Connected")
-		
-		userId := uuid.New().String()
+  defer m.Close()
 
-		s.Set("user_id", userId)
-
-		responsePayload := map[string]interface{}{
-			"type": "user_id",
-			"user_id": userId,
-		}
-
-		marshalledPayload, _ := json.Marshal(responsePayload)
-
-		s.Write(marshalledPayload)
-
-		marshalledPayload, _ = json.Marshal(map[string]interface{}{
-			"type": "another_user_connected",
-			"user_id": userId,
-		})
-
-		m.BroadcastFilter(marshalledPayload, func (q *melody.Session) bool {
-			sId, _ := q.Get("user_id")
-			qId, _ := s.Get("user_id")
-
-			return sId != qId
-		})
-	})
-
-	m.HandleDisconnect(func (s *melody.Session) {
-		log.Println("Disconnected")
-
-		userId, _ := s.Get("user_id")
-
-		marshalledPayload, _ := json.Marshal(map[string]interface{}{
-			"type": "another_user_disconnected",
-			"user_id": userId,
-		})
-
-		m.BroadcastFilter(marshalledPayload, func (q *melody.Session) bool {
-			sId, _ := q.Get("user_id")
-			qId, _ := s.Get("user_id")
-
-			return sId != qId
-		})
-	})
+	m.HandleConnect(func (s *melody.Session) { ws.HandleConnect(s, m) })
+	m.HandleDisconnect(func (s *melody.Session) { ws.HandleDisconnect(s, m) })
 
 	m.HandleMessage(func (s *melody.Session, msg []byte) {
-		var clientPayload map[string]interface{}
-		
-		json.Unmarshal(msg, &clientPayload)
+		var payload map[string]interface{}
 
-		switch clientPayload["type"] {
-			case "message": {
-				sessions, err := m.Sessions()
+		json.Unmarshal(msg, &payload)
 
-				if err != nil {
-					fmt.Println(err)
-
-					return
-				}
-
-				for _, session := range sessions {
-					if receiverId, exists := session.Get("user_id"); exists && receiverId == clientPayload["receiver_id"] {
-						responsePayload := map[string]interface{}{
-							"type": "message",
-							"sender_id": clientPayload["sender_id"],
-							"message": clientPayload["message"],
-						}
-
-						marshalledPayload, _ := json.Marshal(responsePayload)
-
-						session.Write(marshalledPayload)
-					}
-				}
-			}
-
-			case "users_ids": {
-				sessions, err := m.Sessions()
-
-				if err != nil {
-					fmt.Println(err)
-
-					return
-				}
-
-				usersIds := []string{}
-
-				for _, session := range sessions {
-					if userId, exists := session.Get("user_id"); exists {
-						usersIds = append(usersIds, userId.(string))
-					}
-				}
-
-				responsePayload := map[string]interface{}{
-					"type": "users_ids",
-					"users_ids": usersIds,
-				}
-
-				marshalledPayload, _ := json.Marshal(responsePayload)
-
-				s.Write(marshalledPayload)
-			}
+		switch payload["type"] {
+			case "message": ws.HandleMessage(payload, m)
+			case "users_ids": ws.HandleGetUsersIds(s, m)
 		}
-
-
 	})
 
 	log.Println("Server started on :8080")
