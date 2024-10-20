@@ -8,7 +8,9 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Message } from "./message"
-import { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
+import { Table, TableBody, TableCell, TableRow } from "../ui/table"
+import { cn } from "@/lib/utils"
 
 interface Message {
   owner: "sender" | "receiver"
@@ -16,17 +18,14 @@ interface Message {
 }
 
 export function Chat() {
-  const [messages, setMessages] = useState<Message[]>([
-    { owner: "receiver", message: "Hi, how can I help you today?" },
-    { owner: "sender", message: "What seems to be the problem?" },
-    { owner: "receiver", message: "Hey, I'm having trouble with my account." },
-    { owner: "sender", message: "I can't log in." },
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
 
   const [currentMessage, setCurrentMessage] = useState("")
 
   const [userId, setUserId] = useState("")
   const [usersIds, setUsersIds] = useState<string[]>([])
+
+  const [currentActiveChatUserId, setCurrentActiveChatUserId] = useState("")
 
   const [webSocket, setWebSocket] = useState<WebSocket | null>(null)
 
@@ -68,6 +67,7 @@ export function Chat() {
           console.log("User IDs:", data.users_ids)
 
           setUsersIds(data.users_ids)
+          setCurrentActiveChatUserId(usersIds.find(uid => uid != userId) ?? "")
         } break;
 
         case "another_user_connected": {
@@ -116,6 +116,12 @@ export function Chat() {
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
 
+    if (!currentActiveChatUserId) {
+      alert("No chat selected")
+
+      return;
+    }
+
     setMessages((prevMessages) => [
       ...prevMessages,
       { owner: "sender", message: currentMessage },
@@ -127,7 +133,7 @@ export function Chat() {
       type: "message",
       message: currentMessage,
       sender_id: userId,
-      receiver_id: usersIds.find((uid) => uid !== userId),
+      receiver_id: currentActiveChatUserId,
     }))
   }
 
@@ -137,30 +143,73 @@ export function Chat() {
     }
   }
 
+  function handleUsersTableRowClick(e: React.MouseEvent, uid: string) {
+    e.preventDefault()
+
+    if (uid == userId) {
+      return
+    }
+
+    setCurrentActiveChatUserId(uid)
+  }
+
   return (
-    <Card className="w-[350px]">
-      <CardHeader>
-        <CardTitle>Chat</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          {messages.map((message, index) => (
-            <Message key={index} owner={message.owner}>
-              {message.message}
-            </Message>
-          ))}
-        </div>
-      </CardContent>
-      <CardFooter className="flex justify-between">
-        <form onSubmit={handleSubmit}>
-          <div className="grid w-full items-center gap-4">
-            <div className="flex">
-              <Input id="name" placeholder="Name of your project" onKeyDown={handleKeyDown} onChange={(e) => setCurrentMessage(e.target.value)} value={currentMessage} />
-              <Button type="submit">Send</Button>
+    <div className="flex mh-[400px] gap-4">
+      <Card className="w-[350px]">
+        <CardHeader>
+          <CardTitle>Users</CardTitle>
+        </CardHeader>
+        <CardContent className="h-[100%]">
+            <Table >
+              <TableBody>
+                {usersIds.sort(uid => uid == userId ? -1 : 1).map((uid) => (
+                  <TableRow key={uid} onClick={(e) => handleUsersTableRowClick(e, uid)}>
+                    <TableCell className={cn("font-medium", {
+                      "cursor-pointer": uid != userId,
+                      "cursor-not-allowed": uid == userId,
+                      "bg-zinc-300": uid == userId
+                    })}>
+                      {uid == currentActiveChatUserId ? "🔴" : null} {uid}
+                      </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+        </CardContent>
+      </Card>
+
+      <Card className="w-[325px]">
+        <CardHeader>
+          <CardTitle>Chat</CardTitle>
+        </CardHeader>
+        <CardContent>
+            <div className="space-y-4">
+            {messages.length ? messages.map((message, index) => (
+              <Message key={index} owner={message.owner}>
+                {message.message}
+              </Message>
+            )) : (
+              <span>No messages yet</span>
+            )}
             </div>
-          </div>
-        </form>
-      </CardFooter>
-    </Card>
+        </CardContent>
+        <CardFooter className="flex justify-between">
+          <form onSubmit={handleSubmit}>
+            <div className="grid w-full items-center gap-4">
+              <div className="flex">
+                <Input
+                  id="name"
+                  placeholder="Name of your project"
+                  onKeyDown={handleKeyDown}
+                  onChange={(e) => setCurrentMessage(e.target.value)}
+                  value={currentMessage}
+                />
+                <Button type="submit">Send</Button>
+              </div>
+            </div>
+          </form>
+        </CardFooter>
+      </Card>
+    </div>
   )
 }
