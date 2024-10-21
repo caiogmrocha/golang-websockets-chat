@@ -1,20 +1,26 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"log"
 	"net/http"
 
-	"github.com/caiogmrocha/golang-websockets-chat/internal/controller/ws"
+	"github.com/caiogmrocha/golang-websockets-chat/server/configs"
+
+	"github.com/caiogmrocha/golang-websockets-chat/server/internal/controller/ws"
+
 	"github.com/olahol/melody"
 )
 
 func main() {
-	m := melody.New()
+  defer configs.MongoClient.Disconnect(context.Background())
 
-	http.HandleFunc("/ws", func (w http.ResponseWriter, r *http.Request) {
-		m.HandleRequest(w, r)
-	})
+  m := melody.New()
+
+  http.HandleFunc("/ws", func (w http.ResponseWriter, r *http.Request) {
+    m.HandleRequest(w, r)
+  })
 
   defer m.Close()
 

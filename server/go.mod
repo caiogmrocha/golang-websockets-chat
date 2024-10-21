@@ -1,4 +1,4 @@
-module github.com/caiogmrocha/golang-websockets-chat
+module github.com/caiogmrocha/golang-websockets-chat/server
 
 go 1.23.2
 
