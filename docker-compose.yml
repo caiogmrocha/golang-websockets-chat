@@ -2,13 +2,17 @@ version: "3.0"
 
 services:
   websockets-chat-server:
+    container_name: websockets-chat-server
     build:
       context: ./server
       dockerfile: ../docker/dockerfiles/Dockerfile.websockets
     ports:
       - "8080:8080"
+    depends_on:
+      - websockets-chat-mongodb
 
   websockets-chat-mongodb:
+    container_name: websockets-chat-mongodb
     image: mongo
     restart: always
     volumes:
@@ -16,3 +20,13 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: password
+
+  websockets-chat-web:
+    container_name: websockets-chat-web
+    build:
+      context: ./web
+      dockerfile: ../docker/dockerfiles/Dockerfile.web
+    ports:
+      - "3000:3000"
+    depends_on:
+      - websockets-chat-server
