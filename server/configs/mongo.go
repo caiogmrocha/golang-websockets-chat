@@ -20,7 +20,9 @@ func init() {
     os.Getenv("MONGO_PORT"),
   )
 
-  MongoClient, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
+  var err error
+
+  MongoClient, err = mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
 
   if err != nil {
     log.Fatal(err)

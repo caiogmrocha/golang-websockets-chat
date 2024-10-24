@@ -8,7 +8,14 @@ import (
 )
 
 func init() {
-  err := godotenv.Load("configs/.env")
+  cwd, error := os.Getwd()
+
+  if error != nil {
+    log.Fatal(error)
+    os.Exit(1)
+  }
+
+  err := godotenv.Load(cwd + "/../../.env")
 
   if err != nil {
     log.Fatal(err)

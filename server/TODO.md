@@ -1,0 +1,6 @@
+- [] Registrar Usuário
+- [] Autenticar Usuário
+- [] Salvar Chat
+- [] Salvar Mensagem
+- [] Buscar Mensagens de um Chat com um Usuário
+- [] Rotina de Exclusão de Usuários Inativos

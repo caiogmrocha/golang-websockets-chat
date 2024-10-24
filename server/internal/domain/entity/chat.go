@@ -1,8 +1,8 @@
 package entity
 
 type Chat struct {
-	ID int
-	Name string
-	Users []User
-	Messages []Message
+	ID int `json:"id"`
+	Name string `json:"name"`
+	Users [2]User `json:"users"`
+	Messages []Message `json:"messages"`
 }
