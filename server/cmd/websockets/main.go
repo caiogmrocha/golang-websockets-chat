@@ -20,11 +20,15 @@ func main() {
   router := mux.NewRouter()
 
   registerUserController := controllers.NewRegisterUserController()
+  authenticateUserController := controllers.NewAuthenticateUserController()
 
   router.HandleFunc("/users", registerUserController.Create).Methods("POST").Headers("Content-Type", "application/json")
+  router.HandleFunc("/users/authenticate", authenticateUserController.Authenticate).Methods("POST").Headers("Content-Type", "application/json")
 
   // Websockets Handlers
   m := melody.New()
+
+  defer m.Close()
 
 	m.HandleConnect(func (s *melody.Session) { ws.HandleConnect(s, m) })
 	m.HandleDisconnect(func (s *melody.Session) { ws.HandleDisconnect(s, m) })
@@ -43,8 +47,6 @@ func main() {
   router.HandleFunc("/ws", func (w http.ResponseWriter, r *http.Request) {
     m.HandleRequest(w, r)
   })
-
-  defer m.Close()
 
   log.Println("Server started on :8080")
 

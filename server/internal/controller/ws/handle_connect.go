@@ -9,8 +9,9 @@ import (
 )
 
 func HandleConnect(s *melody.Session, m *melody.Melody) {
+    log.Println(s.Request.Header.Get("User-ID"))
 		log.Println("Connected")
-		
+
 		userId := uuid.New().String()
 
 		s.Set("user_id", userId)

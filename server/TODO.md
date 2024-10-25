@@ -1,4 +1,4 @@
-- [] Registrar Usuário
+- [x] Registrar Usuário
 - [] Autenticar Usuário
 - [] Salvar Chat
 - [] Salvar Mensagem
