@@ -16,7 +16,7 @@ type key string
 
 func (m *VerifyAuthenticationHTTPMiddleware) Handle(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		tokenCookie, err := r.Cookie("auth-token")
+		tokenCookie, err := r.Cookie("token")
 
 		if err != nil {
 			http.Error(w, "Token not provided", http.StatusUnauthorized)
@@ -46,4 +46,10 @@ func (m *VerifyAuthenticationHTTPMiddleware) Handle(next http.Handler) http.Hand
 
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
+}
+
+func NewVerifyAuthenticationHTTPMiddleware() *VerifyAuthenticationHTTPMiddleware {
+	return &VerifyAuthenticationHTTPMiddleware{
+		JWTProvider: infra_jwt.JWTProvider{},
+	}
 }

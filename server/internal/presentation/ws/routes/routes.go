@@ -22,5 +22,5 @@ func SetWSHandlers(m *melody.Melody) {
 		case "users_ids":
 			ws_handlers.HandleGetUsersIds(s, m)
 		}
-	}) // Set your websocket handlers here
+	})
 }

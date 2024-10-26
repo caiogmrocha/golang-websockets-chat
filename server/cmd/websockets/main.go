@@ -15,16 +15,13 @@ import (
 func main() {
 	defer configs.MongoClient.Disconnect(context.Background())
 
-	// HTTP Routes
 	router := mux.NewRouter()
 
-	http_routes.SetRoutes(router)
-
-	// Websockets Handlers
 	m := melody.New()
 
 	defer m.Close()
 
+	http_routes.SetRoutes(router, m)
 	ws_routes.SetWSHandlers(m)
 
 	log.Println("Server started on :8080")

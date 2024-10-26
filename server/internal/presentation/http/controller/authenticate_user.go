@@ -78,6 +78,13 @@ func (controller *AuthenticateUserController) Authenticate(w http.ResponseWriter
 		return
 	}
 
+	http.SetCookie(w, &http.Cookie{
+		Name:     "token",
+		Value:    token,
+		MaxAge:   3600,
+		HttpOnly: false,
+	})
+
 	if token == "" {
 		w.WriteHeader(http.StatusUnauthorized)
 		w.Write([]byte(`{"error": "Unauthorized"}`))
