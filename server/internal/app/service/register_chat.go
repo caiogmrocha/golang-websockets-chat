@@ -7,15 +7,15 @@ import (
 	"github.com/caiogmrocha/golang-websockets-chat/server/internal/domain/entity"
 )
 
-type CreateChatServiceDTO struct {
+type RegisterChatServiceDTO struct {
 	UsersIDs [2]string `json:"users_id"`
 }
 
-type CreateChatService struct {
+type RegisterChatService struct {
 	ChatRepository repository.ChatRepository
 }
 
-func (service *CreateChatService) Create(dto *CreateChatServiceDTO) error {
+func (service *RegisterChatService) Create(dto *RegisterChatServiceDTO) error {
 	chat, err := service.ChatRepository.GetByUsersIDs(dto.UsersIDs)
 
 	if err != nil {
