@@ -13,28 +13,28 @@ import (
 var MongoClient *mongo.Client
 
 func init() {
-  uri := fmt.Sprintf("mongodb://%s:%s@%s:%s",
-    os.Getenv("MONGO_USER"),
-    os.Getenv("MONGO_PASS"),
-    os.Getenv("MONGO_HOST"),
-    os.Getenv("MONGO_PORT"),
-  )
+	uri := fmt.Sprintf("mongodb://%s:%s@%s:%s",
+		os.Getenv("MONGO_USER"),
+		os.Getenv("MONGO_PASS"),
+		os.Getenv("MONGO_HOST"),
+		os.Getenv("MONGO_PORT"),
+	)
 
-  var err error
+	var err error
 
-  MongoClient, err = mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
+	MongoClient, err = mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
 
-  if err != nil {
-    log.Fatal(err)
-    os.Exit(1)
-  }
+	if err != nil {
+		log.Fatal(err)
+		os.Exit(1)
+	}
 
-  err = MongoClient.Ping(context.Background(), nil)
+	err = MongoClient.Ping(context.Background(), nil)
 
-  if err != nil {
-    log.Fatal(err)
-    os.Exit(1)
-  }
+	if err != nil {
+		log.Fatal(err)
+		os.Exit(1)
+	}
 
-  log.Println("Connected to MongoDB")
+	log.Println("Connected to MongoDB")
 }

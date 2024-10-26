@@ -2,13 +2,12 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"log"
 	"net/http"
 
 	"github.com/caiogmrocha/golang-websockets-chat/server/configs"
-	controllers "github.com/caiogmrocha/golang-websockets-chat/server/internal/presentation/controller/http"
-	"github.com/caiogmrocha/golang-websockets-chat/server/internal/presentation/controller/ws"
+	http_routes "github.com/caiogmrocha/golang-websockets-chat/server/internal/presentation/http/routes"
+	ws_routes "github.com/caiogmrocha/golang-websockets-chat/server/internal/presentation/ws/routes"
 	"github.com/gorilla/mux"
 	"github.com/olahol/melody"
 )
@@ -19,36 +18,14 @@ func main() {
 	// HTTP Routes
 	router := mux.NewRouter()
 
-	registerUserController := controllers.NewRegisterUserController()
-	authenticateUserController := controllers.NewAuthenticateUserController()
-
-	router.HandleFunc("/users", registerUserController.Create).Methods("POST").Headers("Content-Type", "application/json")
-	router.HandleFunc("/users/authenticate", authenticateUserController.Authenticate).Methods("POST").Headers("Content-Type", "application/json")
+	http_routes.SetRoutes(router)
 
 	// Websockets Handlers
 	m := melody.New()
 
 	defer m.Close()
 
-	m.HandleConnect(func(s *melody.Session) { ws.HandleConnect(s, m) })
-	m.HandleDisconnect(func(s *melody.Session) { ws.HandleDisconnect(s, m) })
-
-	m.HandleMessage(func(s *melody.Session, msg []byte) {
-		var payload map[string]interface{}
-
-		json.Unmarshal(msg, &payload)
-
-		switch payload["type"] {
-		case "message":
-			ws.HandleMessage(payload, m)
-		case "users_ids":
-			ws.HandleGetUsersIds(s, m)
-		}
-	})
-
-	router.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-		m.HandleRequest(w, r)
-	})
+	ws_routes.SetWSHandlers(m)
 
 	log.Println("Server started on :8080")
 

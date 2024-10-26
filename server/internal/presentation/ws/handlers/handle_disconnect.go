@@ -1,4 +1,4 @@
-package ws
+package ws_handlers
 
 import (
 	"encoding/json"
@@ -13,11 +13,11 @@ func HandleDisconnect(s *melody.Session, m *melody.Melody) {
 	userId, _ := s.Get("user_id")
 
 	marshalledPayload, _ := json.Marshal(map[string]interface{}{
-		"type": "another_user_disconnected",
+		"type":    "another_user_disconnected",
 		"user_id": userId,
 	})
 
-	m.BroadcastFilter(marshalledPayload, func (q *melody.Session) bool {
+	m.BroadcastFilter(marshalledPayload, func(q *melody.Session) bool {
 		sId, _ := q.Get("user_id")
 		qId, _ := s.Get("user_id")
 

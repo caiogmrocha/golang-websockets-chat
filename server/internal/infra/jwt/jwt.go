@@ -8,7 +8,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-type JWTProvider struct {}
+type JWTProvider struct{}
 
 func (jwtProvider *JWTProvider) GenerateToken(payload []byte) (string, error) {
 	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
@@ -17,11 +17,11 @@ func (jwtProvider *JWTProvider) GenerateToken(payload []byte) (string, error) {
 		"iat": time.Now().Unix(),
 	})
 
-  tokenString, err := claims.SignedString([]byte(os.Getenv("JWT_SECRET")))
+	tokenString, err := claims.SignedString([]byte(os.Getenv("JWT_SECRET")))
 
-  if err != nil {
-    return "", err
-  }
+	if err != nil {
+		return "", err
+	}
 
 	return tokenString, nil
 }
