@@ -20,7 +20,7 @@ type AuthenticateUserServiceParamsDTO struct {
 }
 
 type AuthenticateUserServiceTokenPayload struct {
-	ID int `json:"id"`
+	ID string `json:"id"`
 }
 
 func (service *AuthenticateUserService) Authenticate(dto *AuthenticateUserServiceParamsDTO) (token string, err error) {
@@ -40,7 +40,7 @@ func (service *AuthenticateUserService) Authenticate(dto *AuthenticateUserServic
 		return "", err
 	}
 
-	marshalledPayload, _ := json.Marshal(AuthenticateUserServiceTokenPayload{ID: user.ID})
+	marshalledPayload, _ := json.Marshal(AuthenticateUserServiceTokenPayload{ID: user.ID.String()})
 
 	token, err = service.JWTProvider.GenerateToken([]byte(marshalledPayload))
 
