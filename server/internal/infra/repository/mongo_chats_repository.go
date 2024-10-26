@@ -40,3 +40,11 @@ func (repo *MongoChatsRepository) GetByUsersIDs(usersIDs [2]string) (*entity.Cha
 
 	return nil, err
 }
+
+func (repo *MongoChatsRepository) Create(chat *entity.Chat) error {
+	coll := configs.MongoClient.Database(os.Getenv("MONGO_DB")).Collection("chats")
+
+	_, err := coll.InsertOne(context.TODO(), chat)
+
+	return err
+}
