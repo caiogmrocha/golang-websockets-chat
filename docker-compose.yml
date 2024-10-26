@@ -8,6 +8,9 @@ services:
       dockerfile: ../docker/dockerfiles/Dockerfile.websockets
     ports:
       - "8080:8080"
+      - "2345:2345"
+    volumes:
+      - ./server:/app
     depends_on:
       - websockets-chat-mongodb
 
@@ -17,9 +20,12 @@ services:
     restart: always
     volumes:
       - ./docker/volumes/mongodb:/data/db
+    ports:
+      - "27017:27017"
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: golang-websockets-chat
 
   websockets-chat-web:
     container_name: websockets-chat-web

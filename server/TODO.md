@@ -1,5 +1,5 @@
 - [x] Registrar Usuário
-- [] Autenticar Usuário
+- [x] Autenticar Usuário
 - [] Salvar Chat
 - [] Salvar Mensagem
 - [] Buscar Mensagens de um Chat com um Usuário

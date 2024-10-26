@@ -1,17 +1,19 @@
 FROM golang:1.23.2-alpine
 
 RUN apk update && apk upgrade && apk add --no-cache bash git openssh
-    
+
 WORKDIR /app
 
 COPY go.mod go.sum ./
 
 RUN go mod download
 
+RUN go install github.com/go-delve/delve/cmd/dlv@latest
+
 COPY . .
 
-RUN go build -o websockets ./cmd/websockets/main.go
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -gcflags="-N -l" -a -o main ./cmd/websockets/main.go
 
-EXPOSE 8080
+EXPOSE 8080 2345
 
-CMD ["./websockets"]
+CMD ["dlv", "exec", "--headless", "--listen=:2345", "--api-version=2", "main"]

@@ -1,4 +1,4 @@
-package jwt_impl
+package infra_jwt
 
 import (
 	"fmt"
