@@ -3,7 +3,6 @@ package http_routes
 import (
 	"net/http"
 
-	// http_middleware "github.com/caiogmrocha/golang-websockets-chat/server/internal/presentation/http/middleware"
 	http_middleware "github.com/caiogmrocha/golang-websockets-chat/server/internal/presentation/http/middleware"
 	"github.com/gorilla/mux"
 	"github.com/olahol/melody"

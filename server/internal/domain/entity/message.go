@@ -1,12 +1,12 @@
 package entity
 
 type Message struct {
-	ID         int    `json:"id"`
-	ChatID     int    `json:"chat_id"`
-	Chat       Chat   `json:"chat"`
-	ReceiverId int    `json:"receiver_id"`
-	Receiver   User   `json:"receiver"`
-	SenderId   int    `json:"sender_id"`
-	Sender     User   `json:"sender"`
-	Content    string `json:"content"`
+	ID         string `json:"id" bson:"_id,omitempty"`
+	ChatID     string `json:"chat_id" bson:"chatId"`
+	Chat       Chat   `json:"chat" bson:"-"`
+	ReceiverId string `json:"receiver_id" bson:"receiverId"`
+	Receiver   User   `json:"receiver" bson:"-"`
+	SenderId   string `json:"sender_id" bson:"senderId"`
+	Sender     User   `json:"sender" bson:"-"`
+	Content    string `json:"content" bson:"content"`
 }

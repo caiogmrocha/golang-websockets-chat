@@ -2,7 +2,6 @@ package infra_repository
 
 import (
 	"context"
-	"log"
 	"os"
 
 	"github.com/caiogmrocha/golang-websockets-chat/server/configs"
@@ -13,12 +12,6 @@ import (
 type MongoUsersRepository struct{}
 
 func (repo *MongoUsersRepository) GetByEmail(email string) (*entity.User, error) {
-	defer func() {
-		if r := recover(); r != nil {
-			log.Println("Recovered in GetByEmail", r)
-		}
-	}()
-
 	coll := configs.MongoClient.Database(os.Getenv("MONGO_DB")).Collection("users")
 
 	var user entity.User

@@ -4,21 +4,20 @@ import (
 	"encoding/json"
 	"log"
 
-	"github.com/google/uuid"
 	"github.com/olahol/melody"
 )
 
 func HandleConnect(s *melody.Session, m *melody.Melody) {
-	log.Println(s.Request.Header.Get("User-ID"))
+	userID := s.Request.Context().Value("userID")
+
+	log.Println(userID)
 	log.Println("Connected")
 
-	userId := uuid.New().String()
-
-	s.Set("user_id", userId)
+	s.Set("user_id", userID)
 
 	responsePayload := map[string]interface{}{
 		"type":    "user_id",
-		"user_id": userId,
+		"user_id": userID,
 	}
 
 	marshalledPayload, _ := json.Marshal(responsePayload)
@@ -27,7 +26,7 @@ func HandleConnect(s *melody.Session, m *melody.Melody) {
 
 	marshalledPayload, _ = json.Marshal(map[string]interface{}{
 		"type":    "another_user_connected",
-		"user_id": userId,
+		"user_id": userID,
 	})
 
 	m.BroadcastFilter(marshalledPayload, func(q *melody.Session) bool {
