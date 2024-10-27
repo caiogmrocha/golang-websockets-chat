@@ -5,11 +5,12 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/gorilla/mux"
+	"github.com/olahol/melody"
+
 	"github.com/caiogmrocha/golang-websockets-chat/server/configs"
 	http_routes "github.com/caiogmrocha/golang-websockets-chat/server/internal/presentation/http/routes"
 	ws_routes "github.com/caiogmrocha/golang-websockets-chat/server/internal/presentation/ws/routes"
-	"github.com/gorilla/mux"
-	"github.com/olahol/melody"
 )
 
 func main() {

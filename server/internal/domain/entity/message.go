@@ -4,11 +4,11 @@ import "go.mongodb.org/mongo-driver/bson/primitive"
 
 type Message struct {
 	ID         primitive.ObjectID `json:"id" bson:"_id,omitempty"`
-	ChatID     string             `json:"chat_id" bson:"chatId"`
+	ChatID     string             `json:"chatId" bson:"chatId"`
 	Chat       Chat               `json:"chat" bson:"-"`
-	ReceiverID string             `json:"receiver_id" bson:"receiverId"`
+	ReceiverID string             `json:"receiverId" bson:"receiverId"`
 	Receiver   User               `json:"receiver" bson:"-"`
-	SenderID   string             `json:"sender_id" bson:"senderId"`
+	SenderID   string             `json:"senderId" bson:"senderId"`
 	Sender     User               `json:"sender" bson:"-"`
 	Content    string             `json:"content" bson:"content"`
 }
