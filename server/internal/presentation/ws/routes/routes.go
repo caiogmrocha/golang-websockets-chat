@@ -18,7 +18,9 @@ func SetWSHandlers(m *melody.Melody) {
 
 		switch payload["type"] {
 		case "message":
-			ws_handlers.HandleMessage(payload, m)
+			UserMessageHandler := ws_handlers.NewUserMessageHandler()
+
+			UserMessageHandler.HandleMessage(s, m, payload)
 		case "users_ids":
 			ws_handlers.HandleGetUsersIds(s, m)
 		}

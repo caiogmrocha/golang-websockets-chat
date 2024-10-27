@@ -6,23 +6,42 @@ import (
 )
 
 type RegisterMessageServiceDTO struct {
-	ChatID     string `json:"chat_id"`
 	ReceiverID string `json:"receiver_id"`
 	SenderID   string `json:"sender_id"`
 	Content    string `json:"content"`
 }
 
 type RegisterMessageService struct {
-	MessageRepository repository.MessagesRepository
+	MessagesRepository repository.MessagesRepository
+	ChatsRepository    repository.ChatsRepository
 }
 
 func (service *RegisterMessageService) Create(dto *RegisterMessageServiceDTO) error {
+	chat, err := service.ChatsRepository.GetByUsersIDs([2]string{dto.SenderID, dto.ReceiverID})
+
+	if err != nil {
+		return err
+	}
+
+	if chat == nil {
+		chat = &entity.Chat{
+			UsersIDs:    [2]string{dto.SenderID, dto.ReceiverID},
+			MessagesIDs: []string{},
+		}
+
+		err = service.ChatsRepository.Create(chat)
+
+		if err != nil {
+			return err
+		}
+	}
+
 	message := &entity.Message{
-		ChatID:     dto.ChatID,
+		ChatID:     chat.ID.String(),
 		ReceiverID: dto.ReceiverID,
 		SenderID:   dto.SenderID,
 		Content:    dto.Content,
 	}
 
-	return service.MessageRepository.Create(message)
+	return service.MessagesRepository.Create(message)
 }

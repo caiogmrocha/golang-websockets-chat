@@ -12,7 +12,7 @@ type VerifyAuthenticationHTTPMiddleware struct {
 	JWTProvider infra_jwt.JWTProvider
 }
 
-type key string
+type Key string
 
 func (m *VerifyAuthenticationHTTPMiddleware) Handle(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -42,7 +42,7 @@ func (m *VerifyAuthenticationHTTPMiddleware) Handle(next http.Handler) http.Hand
 			return
 		}
 
-		ctx := context.WithValue(r.Context(), key("userID"), unmarsheledPayload["sub"])
+		ctx := context.WithValue(r.Context(), Key("userID"), unmarsheledPayload["id"])
 
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})

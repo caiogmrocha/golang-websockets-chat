@@ -132,7 +132,6 @@ export function Chat() {
     webSocket!.send(JSON.stringify({
       type: "message",
       message: currentMessage,
-      sender_id: userId,
       receiver_id: currentActiveChatUserId,
     }))
   }

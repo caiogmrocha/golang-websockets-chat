@@ -6,6 +6,7 @@ import (
 
 	"github.com/caiogmrocha/golang-websockets-chat/server/internal/app/interfaces/jwt"
 	"github.com/caiogmrocha/golang-websockets-chat/server/internal/app/interfaces/repository"
+	"github.com/caiogmrocha/golang-websockets-chat/server/internal/utils"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -40,7 +41,9 @@ func (service *AuthenticateUserService) Authenticate(dto *AuthenticateUserServic
 		return "", err
 	}
 
-	marshalledPayload, _ := json.Marshal(AuthenticateUserServiceTokenPayload{ID: user.ID.String()})
+	userID, _ := utils.ExtractObjectID(user.ID)
+
+	marshalledPayload, _ := json.Marshal(AuthenticateUserServiceTokenPayload{ID: userID})
 
 	token, err = service.JWTProvider.GenerateToken([]byte(marshalledPayload))
 

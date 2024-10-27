@@ -4,10 +4,16 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/caiogmrocha/golang-websockets-chat/server/internal/app/service"
+	infra_repository "github.com/caiogmrocha/golang-websockets-chat/server/internal/infra/repository"
 	"github.com/olahol/melody"
 )
 
-func HandleMessage(payload map[string]interface{}, m *melody.Melody) {
+type UserMessageHandler struct {
+	registerMessageService *service.RegisterMessageService
+}
+
+func (h *UserMessageHandler) HandleMessage(s *melody.Session, m *melody.Melody, payload map[string]interface{}) {
 	sessions, err := m.Sessions()
 
 	if err != nil {
@@ -18,15 +24,34 @@ func HandleMessage(payload map[string]interface{}, m *melody.Melody) {
 
 	for _, session := range sessions {
 		if receiverId, exists := session.Get("user_id"); exists && receiverId == payload["receiver_id"] {
+			senderID, _ := s.Get("user_id")
+
+			h.registerMessageService.Create(&service.RegisterMessageServiceDTO{
+				ReceiverID: payload["receiver_id"].(string),
+				SenderID:   senderID.(string),
+				Content:    payload["message"].(string),
+			})
+
 			responsePayload := map[string]interface{}{
 				"type":      "message",
-				"sender_id": payload["sender_id"],
+				"sender_id": senderID.(string),
 				"message":   payload["message"],
 			}
 
 			marshalledPayload, _ := json.Marshal(responsePayload)
 
 			session.Write(marshalledPayload)
+
+			return
 		}
+	}
+}
+
+func NewUserMessageHandler() *UserMessageHandler {
+	return &UserMessageHandler{
+		registerMessageService: &service.RegisterMessageService{
+			MessagesRepository: &infra_repository.MongoMessagesRepository{},
+			ChatsRepository:    &infra_repository.MongoChatsRepository{},
+		},
 	}
 }

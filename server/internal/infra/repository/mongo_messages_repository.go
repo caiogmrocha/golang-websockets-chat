@@ -37,6 +37,26 @@ func (repo *MongoMessagesRepository) GetBySenderIdAndReceiverId(senderID, receiv
 	return messages, nil
 }
 
+func (repo *MongoMessagesRepository) GetByChatID(chatID string) ([]entity.Message, error) {
+	coll := configs.MongoClient.Database(os.Getenv("MONGO_DB")).Collection("messages")
+
+	cursor, err := coll.Find(context.TODO(), bson.M{"chatId": chatID})
+
+	if err != nil {
+		return nil, err
+	}
+
+	var messages []entity.Message
+
+	err = cursor.All(context.TODO(), &messages)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return messages, nil
+}
+
 func (repo *MongoMessagesRepository) Create(message *entity.Message) error {
 	coll := configs.MongoClient.Database(os.Getenv("MONGO_DB")).Collection("messages")
 

@@ -12,7 +12,7 @@ type RegisterChatServiceDTO struct {
 }
 
 type RegisterChatService struct {
-	ChatRepository repository.ChatRepository
+	ChatRepository repository.ChatsRepository
 }
 
 func (service *RegisterChatService) Create(dto *RegisterChatServiceDTO) error {

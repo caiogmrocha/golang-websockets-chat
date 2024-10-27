@@ -8,12 +8,9 @@ import (
 )
 
 func HandleConnect(s *melody.Session, m *melody.Melody) {
-	userID := s.Request.Context().Value("userID")
+	userID, _ := s.Get("user_id")
 
-	log.Println(userID)
 	log.Println("Connected")
-
-	s.Set("user_id", userID)
 
 	responsePayload := map[string]interface{}{
 		"type":    "user_id",

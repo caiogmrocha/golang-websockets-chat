@@ -16,6 +16,10 @@ func SetWSRoutes(router *mux.Router, m *melody.Melody) {
 	subrouter.Use(verifyAuthenticationHTTPMiddleware.Handle)
 
 	subrouter.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-		m.HandleRequest(w, r)
+		userID := r.Context().Value(http_middleware.Key("userID"))
+
+		m.HandleRequestWithKeys(w, r, map[string]interface{}{
+			"user_id": userID,
+		})
 	})
 }
