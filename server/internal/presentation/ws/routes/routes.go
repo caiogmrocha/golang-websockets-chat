@@ -23,6 +23,10 @@ func SetWSHandlers(m *melody.Melody) {
 			UserMessageHandler.HandleMessage(s, m, payload)
 		case "users_ids":
 			ws_handlers.HandleGetUsersIds(s, m)
+		case "all_messages":
+			GetAllChatMessagesHandler := ws_handlers.NewGetAllChatMessagesHandler()
+
+			GetAllChatMessagesHandler.Handle(s, m, payload)
 		}
 	})
 }
