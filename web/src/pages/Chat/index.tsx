@@ -9,7 +9,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Message } from "./message"
 import React, { useEffect, useState } from "react"
-import { Table, TableBody, TableCell, TableRow } from "../ui/table"
+import { Table, TableBody, TableCell, TableRow } from "../../components/ui/table"
 import { cn } from "@/lib/utils"
 
 interface Message {
