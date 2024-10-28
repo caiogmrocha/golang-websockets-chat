@@ -9,6 +9,8 @@ services:
     ports:
       - "8080:8080"
       - "2345:2345"
+    environment:
+      MONGO_HOST: websockets-chat-mongodb
     volumes:
       - ./server:/app
     depends_on:
