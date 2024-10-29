@@ -82,7 +82,9 @@ func (controller *AuthenticateUserController) Authenticate(w http.ResponseWriter
 		Name:     "token",
 		Value:    token,
 		MaxAge:   3600,
-		HttpOnly: true,
+		HttpOnly: false,
+		SameSite: http.SameSiteNoneMode,
+		Secure:   false,
 	})
 
 	if token == "" {

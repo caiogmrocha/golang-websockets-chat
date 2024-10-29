@@ -8,17 +8,10 @@ import (
 )
 
 func init() {
-  cwd, error := os.Getwd()
+	err := godotenv.Load(".env")
 
-  if error != nil {
-    log.Fatal(error)
-    os.Exit(1)
-  }
-
-  err := godotenv.Load(cwd + "/../../.env")
-
-  if err != nil {
-    log.Fatal(err)
-    os.Exit(1)
-  }
+	if err != nil {
+		log.Fatal(err)
+		os.Exit(1)
+	}
 }
