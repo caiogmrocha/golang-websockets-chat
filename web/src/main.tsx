@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import { RouterProvider, createBrowserRouter } from 'react-router-dom'
 import { Chat } from './pages/Chat/index.tsx'
+import { SignInPage } from './pages/SignIn/index.tsx'
 
 const router = createBrowserRouter([
   {
@@ -12,6 +13,10 @@ const router = createBrowserRouter([
   {
     path: "/chat",
     element: <Chat />,
+  },
+  {
+    path: "/sign-in",
+    element: <SignInPage />,
   }
 ])
 
