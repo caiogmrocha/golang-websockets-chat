@@ -4,18 +4,16 @@ RUN apk update && apk upgrade && apk add --no-cache bash git openssh
 
 WORKDIR /app
 
+COPY . .
+
 COPY go.mod go.sum ./
 
 RUN go mod download
 
 RUN go install github.com/go-delve/delve/cmd/dlv@latest
 
-COPY . .
-
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -gcflags="-N -l" -a -o ./cmd/websockets/main ./cmd/websockets/main.go
 
-EXPOSE 8080
+EXPOSE 8080 4040
 
-WORKDIR /app/cmd/websockets
-
-CMD ["./main"]
+CMD ["dlv", "exec", "--headless", "--listen=:4040", "--api-version=2", "./cmd/websockets/main"]

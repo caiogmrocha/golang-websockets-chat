@@ -8,11 +8,9 @@ services:
       dockerfile: ../docker/dockerfiles/Dockerfile.websockets
     ports:
       - "8080:8080"
-      - "2345:2345"
+      - "4040:4040"
     environment:
       MONGO_HOST: websockets-chat-mongodb
-    volumes:
-      - ./server:/app
     depends_on:
       - websockets-chat-mongodb
 
@@ -36,5 +34,7 @@ services:
       dockerfile: ../docker/dockerfiles/Dockerfile.web
     ports:
       - "3000:3000"
+    volumes:
+      - ./web:/app
     depends_on:
       - websockets-chat-server
