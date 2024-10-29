@@ -12,13 +12,13 @@ import React, { useEffect, useState } from "react"
 import { Table, TableBody, TableCell, TableRow } from "../../components/ui/table"
 import { cn } from "@/lib/utils"
 
-interface Message {
+interface MessageData {
   owner: "sender" | "receiver"
-  message: string
+  content: string
 }
 
 export function Chat() {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<MessageData[]>([]);
 
   const [currentMessage, setCurrentMessage] = useState("")
 
@@ -52,7 +52,7 @@ export function Chat() {
           if (data.type === "message") {
             setMessages((prevMessages) => [
               ...prevMessages,
-              { owner: "receiver", message: data.message },
+              { owner: "receiver", content: data.message },
             ])
           }
         } break;
@@ -83,6 +83,12 @@ export function Chat() {
           console.log("Another user disconnected:", data.user_id)
 
           setUsersIds((prevUsersIds) => prevUsersIds.filter((userId) => userId !== data.user_id))
+        } break;
+
+        case "all_messages": {
+          console.log("All messages:", data.messages)
+
+          setMessages(data.messages)
         } break;
 
         default: {
@@ -124,7 +130,7 @@ export function Chat() {
 
     setMessages((prevMessages) => [
       ...prevMessages,
-      { owner: "sender", message: currentMessage },
+      { owner: "sender", content: currentMessage },
     ])
 
     setCurrentMessage("")
@@ -150,6 +156,11 @@ export function Chat() {
     }
 
     setCurrentActiveChatUserId(uid)
+
+    webSocket!.send(JSON.stringify({
+      type: "all_messages",
+      receiver_id: uid,
+    }))
   }
 
   return (
@@ -185,7 +196,7 @@ export function Chat() {
             <div className="space-y-4">
             {messages.length ? messages.map((message, index) => (
               <Message key={index} owner={message.owner}>
-                {message.message}
+                {message.content}
               </Message>
             )) : (
               <span>No messages yet</span>

@@ -17,9 +17,9 @@
       "type": "go",
       "request": "attach",
       "mode": "remote",
-      "remotePath": "${workspaceFolder}",
+      "remotePath": "/app",
       "port": 4040,
-      "host": "0.0.0.0"
+      "host": "localhost"
     }
   ]
 }
