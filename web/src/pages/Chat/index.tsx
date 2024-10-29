@@ -170,8 +170,14 @@ export function Chat() {
           <CardTitle>Users</CardTitle>
         </CardHeader>
         <CardContent className="h-[100%]">
-            <Table >
+            <Table>
               <TableBody>
+                {usersIds.length === 0 ? (
+                  <TableRow>
+                    <TableCell>No users online</TableCell>
+                  </TableRow>
+                ) : null}
+
                 {usersIds.sort(uid => uid == userId ? -1 : 1).map((uid) => (
                   <TableRow key={uid} onClick={(e) => handleUsersTableRowClick(e, uid)}>
                     <TableCell className={cn("font-medium", {
