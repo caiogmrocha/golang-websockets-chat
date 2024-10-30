@@ -122,10 +122,8 @@ export function Chat() {
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
 
-    if (!currentActiveChatUserId) {
-      alert("No chat selected")
-
-      return;
+    if (!currentMessage) {
+      return
     }
 
     setMessages((prevMessages) => [
@@ -167,14 +165,14 @@ export function Chat() {
     <div className="flex mh-[400px] gap-4">
       <Card className="w-[350px]">
         <CardHeader>
-          <CardTitle>Users</CardTitle>
+          <CardTitle>Online Users</CardTitle>
         </CardHeader>
         <CardContent className="h-[100%]">
             <Table>
               <TableBody>
                 {usersIds.length === 0 ? (
-                  <TableRow>
-                    <TableCell>No users online</TableCell>
+                  <TableRow className="border border-zinc-900">
+                    <TableCell className="text-center">No users online</TableCell>
                   </TableRow>
                 ) : null}
 
@@ -194,35 +192,39 @@ export function Chat() {
         </CardContent>
       </Card>
 
-      <Card className="w-[325px]">
-        <CardHeader>
+      <Card className="w-[400px]">
+        <CardHeader className="border-b border-zinc-200">
           <CardTitle>Chat</CardTitle>
         </CardHeader>
-        <CardContent>
-            <div className="space-y-4">
-            {messages.length ? messages.map((message, index) => (
-              <Message key={index} owner={message.owner}>
-                {message.content}
-              </Message>
-            )) : (
-              <span>No messages yet</span>
-            )}
+        <CardContent className="p-0">
+            <div className="space-y-4 overflow-auto max-h-[350px] h-[100%] p-4">
+              {messages.length ? messages.map((message, index) => (
+                <Message key={index} owner={message.owner}>
+                  {message.content}
+                </Message>
+              )) : currentActiveChatUserId ? (
+                <span>Select a user to chat with</span>
+              ) : (
+                <span>No messages yet</span>
+              )}
             </div>
         </CardContent>
-        <CardFooter className="flex justify-between">
-          <form onSubmit={handleSubmit}>
-            <div className="grid w-full items-center gap-4">
-              <div className="flex">
-                <Input
-                  id="name"
-                  placeholder="Name of your project"
-                  onKeyDown={handleKeyDown}
-                  onChange={(e) => setCurrentMessage(e.target.value)}
-                  value={currentMessage}
-                />
-                <Button type="submit">Send</Button>
-              </div>
-            </div>
+        <CardFooter className="border-t border-zinc-200 p-4">
+          <form onSubmit={handleSubmit} className="w-[100%] h-[100%] flex gap-4">
+            <Input
+              id="name"
+              placeholder="Type a message..."
+              onKeyDown={handleKeyDown}
+              onChange={(e) => setCurrentMessage(e.target.value)}
+              value={currentMessage}
+            />
+
+            <Button
+              type="submit"
+              disabled={!currentActiveChatUserId}
+            >
+              Send
+            </Button>
           </form>
         </CardFooter>
       </Card>
