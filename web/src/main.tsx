@@ -1,14 +1,25 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
-import { RouterProvider, createBrowserRouter } from 'react-router-dom'
+import { Link, RouterProvider, createBrowserRouter } from 'react-router-dom'
 import { Chat } from './pages/Chat/index.tsx'
 import { SignInPage } from './pages/SignIn/index.tsx'
+import { Button } from './components/ui/button.tsx'
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <h1>Hello World</h1>,
+    element: (
+      <>
+        <Link to="/chat">
+          <Button>Chat</Button>
+        </Link>
+
+        <Link to="/sign-in">
+          <Button>Sign In</Button>
+        </Link>
+      </>
+    ),
   },
   {
     path: "/chat",
