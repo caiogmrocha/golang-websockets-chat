@@ -1,4 +1,5 @@
 docker/volumes/*
 !docker/volumes/.gitkeep
+!docker/volumes/nginx/nginx.conf
 
 server/.env
