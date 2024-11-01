@@ -14,6 +14,10 @@ import { Label } from "@/components/ui/label"
 import { useNavigate } from "react-router-dom"
 
 export function SignInPage() {
+  console.log(import.meta.env.VITE_VERCEL_ENV)
+  console.log(import.meta.env.VITE_HTTP_API_URL)
+  console.log(import.meta.env.VITE_WS_API_URL)
+
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
 
@@ -22,7 +26,7 @@ export function SignInPage() {
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault()
 
-    const response = await fetch("http://localhost:8080/users/authenticate", {
+    const response = await fetch(`${import.meta.env.VITE_HTTP_API_URL}/users/authenticate`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

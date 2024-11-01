@@ -30,7 +30,7 @@ export function Chat() {
   const [webSocket, setWebSocket] = useState<WebSocket | null>(null)
 
   useEffect(() => {
-    let webSocket = new WebSocket("ws://localhost:8080/ws")
+    let webSocket = new WebSocket(`${import.meta.env.VITE_WS_API_URL}/ws`)
 
     setWebSocket(webSocket)
 
