@@ -1,17 +1,37 @@
 version: "3.9"
 
 services:
-  websockets-chat-server:
-    container_name: websockets-chat-server
+  websockets-chat-api:
+    container_name: websockets-chat-api
     build:
       context: ./server
       dockerfile: ../docker/dockerfiles/dist/Dockerfile.api
-    ports:
-      - "8080:8080"
     environment:
       MONGO_HOST: websockets-chat-mongodb
     depends_on:
       - websockets-chat-mongodb
+
+  websockets-chat-react:
+    container_name: websockets-chat-react
+    build:
+      context: .
+      dockerfile: ./docker/dockerfiles/dist/Dockerfile.react
+    volumes:
+      - react-build:/app/dist
+
+  websockets-chat-server:
+    container_name: websockets-chat-server
+    build:
+      context: .
+      dockerfile: ./docker/dockerfiles/dist/Dockerfile.nginx
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - react-build:/usr/share/nginx/html
+    depends_on:
+      - websockets-chat-react
+      - websockets-chat-api
 
   websockets-chat-mongodb:
     container_name: websockets-chat-mongodb
@@ -25,3 +45,10 @@ services:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: password
       MONGO_INITDB_DATABASE: golang-websockets-chat
+
+volumes:
+  react-build:
+
+networks:
+  default:
+    driver: bridge

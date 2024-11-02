@@ -1,0 +1,12 @@
+FROM node:20.14.0-alpine
+
+WORKDIR /app
+
+COPY ./web/package.json ./package.json
+COPY ./web/pnpm-lock.yaml ./pnpm-lock.yaml
+COPY ./web .
+
+RUN npm i -g pnpm
+RUN pnpm install
+
+RUN pnpm run build
