@@ -1,6 +1,6 @@
-import { useState } from "react"
+import { useState } from "react";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -8,19 +8,20 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { useNavigate } from "react-router-dom"
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useNavigate } from "react-router-dom";
+import { toast } from "@/hooks/use-toast";
 
 export function SignInPage() {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   async function handleSubmit(event: React.FormEvent) {
-    event.preventDefault()
+    event.preventDefault();
 
     const response = await fetch(`${import.meta.env.VITE_HTTP_API_URL}/users/authenticate`, {
       method: "POST",
@@ -29,21 +30,25 @@ export function SignInPage() {
       },
       body: JSON.stringify({ email, password }),
       credentials: "include",
-    })
+    });
+
+    const parsedResponse = await response.json();
 
     if (!response.ok) {
-      alert("Invalid e-mail or password")
+      toast({
+        title: "An error occurred",
+        description: parsedResponse.error ?? "An error occurred",
+        variant: "destructive",
+      })
 
-      return
+      return;
     }
 
-    const { token } = await response.json();
+    document.cookie = `token=${parsedResponse.token}`;
 
-    document.cookie = `token=${token}`
+    toast({ title: "Signed in successfully" });
 
-    alert("You are now signed in")
-
-    return navigate("/chat")
+    return navigate("/chat");
   }
 
   return (
@@ -81,5 +86,5 @@ export function SignInPage() {
         </CardFooter>
       </form>
     </Card>
-  )
+  );
 }

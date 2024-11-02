@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { toast } from "@/hooks/use-toast";
 import { Label } from "@radix-ui/react-label";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -27,10 +28,16 @@ export function SignUpPage() {
     const parsedResponse = await response.json();
 
     if (!response.ok) {
-      alert(parsedResponse.error ?? "An error occurred")
+      toast({
+        title: "An error occurred",
+        description: parsedResponse.error ?? "An error occurred",
+        variant: "destructive",
+      })
 
       return
     }
+
+    toast({ title: "Signed up successfully" })
 
     return navigate("/sign-in")
   }
