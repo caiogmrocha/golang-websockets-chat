@@ -6,6 +6,7 @@ import { HomePage } from './pages/Home/index.tsx'
 import { ChatPage } from './pages/Chat/index.tsx'
 import { SignInPage } from './pages/SignIn/index.tsx'
 import { SignUpPage } from './pages/SignUp/index.tsx'
+import { Toaster } from './components/ui/toaster.tsx'
 
 const router = createBrowserRouter([
   {
@@ -26,11 +27,11 @@ const router = createBrowserRouter([
   }
 ])
 
-
 createRoot(document.getElementById('root')!).render(
   <div className="flex items-center justify-center h-screen">
     <StrictMode>
       <RouterProvider router={router} />
+      <Toaster />
     </StrictMode>
   </div>
 )
