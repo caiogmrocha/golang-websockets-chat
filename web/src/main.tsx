@@ -31,6 +31,7 @@ const router = createBrowserRouter([
   }
 ])
 
+
 createRoot(document.getElementById('root')!).render(
   <div className="flex items-center justify-center h-screen">
     <StrictMode>

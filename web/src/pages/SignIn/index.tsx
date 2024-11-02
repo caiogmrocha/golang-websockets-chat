@@ -14,14 +14,12 @@ import { Label } from "@/components/ui/label"
 import { useNavigate } from "react-router-dom"
 
 export function SignInPage() {
-  console.log(import.meta.env.VITE_VERCEL_ENV)
-  console.log(import.meta.env.VITE_HTTP_API_URL)
-  console.log(import.meta.env.VITE_WS_API_URL)
-
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
 
   const navigate = useNavigate()
+
+  console.log(import.meta.env);
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault()
