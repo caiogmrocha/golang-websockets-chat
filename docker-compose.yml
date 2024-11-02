@@ -29,6 +29,10 @@ services:
       - "8080:8080"
     volumes:
       - react-build:/usr/share/nginx/html
+    environment:
+      VITE_HTTP_API_URL: ${VITE_HTTP_API_URL}
+      VITE_WS_API_URL: ${VITE_WS_API_URL}
+
     depends_on:
       - websockets-chat-react
       - websockets-chat-api
