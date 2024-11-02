@@ -13,12 +13,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/auth-context";
 
 export function SignInPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const navigate = useNavigate();
+
+  const authContext = useAuth();
+
+  console.log(authContext.isAuthenticated);
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -45,6 +50,10 @@ export function SignInPage() {
     }
 
     document.cookie = `token=${parsedResponse.token}`;
+
+    localStorage.setItem("isAuthenticated", "true");
+
+    authContext.setIsAuthenticated(JSON.parse(localStorage.getItem("isAuthenticated")!));
 
     toast({ title: "Signed in successfully" });
 

@@ -1,12 +1,15 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import './index.css'
 import { RouterProvider, createBrowserRouter } from 'react-router-dom'
+
+import './index.css'
+
 import { HomePage } from './pages/Home/index.tsx'
 import { ChatPage } from './pages/Chat/index.tsx'
 import { SignInPage } from './pages/SignIn/index.tsx'
 import { SignUpPage } from './pages/SignUp/index.tsx'
 import { Toaster } from './components/ui/toaster.tsx'
+import { AuthContextProvider } from './contexts/auth-context.tsx'
 
 const router = createBrowserRouter([
   {
@@ -30,8 +33,10 @@ const router = createBrowserRouter([
 createRoot(document.getElementById('root')!).render(
   <div className="flex items-center justify-center h-screen">
     <StrictMode>
-      <RouterProvider router={router} />
-      <Toaster />
+      <AuthContextProvider>
+        <RouterProvider router={router} />
+        <Toaster />
+      </AuthContextProvider>
     </StrictMode>
   </div>
 )

@@ -11,6 +11,7 @@ import { Message } from "./message"
 import React, { useEffect, useState } from "react"
 import { Table, TableBody, TableCell, TableRow } from "../../components/ui/table"
 import { cn } from "@/lib/utils"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 interface MessageData {
   owner: "sender" | "receiver"
@@ -20,32 +21,32 @@ interface MessageData {
 export function ChatPage() {
   const [messages, setMessages] = useState<MessageData[]>([]);
 
-  const [currentMessage, setCurrentMessage] = useState("")
+  const [currentMessage, setCurrentMessage] = useState("");
 
-  const [userId, setUserId] = useState("")
-  const [usersIds, setUsersIds] = useState<string[]>([])
+  const [userId, setUserId] = useState("");
+  const [usersIds, setUsersIds] = useState<string[]>([]);
 
-  const [currentActiveChatUserId, setCurrentActiveChatUserId] = useState("")
+  const [currentActiveChatUserId, setCurrentActiveChatUserId] = useState("");
 
-  const [webSocket, setWebSocket] = useState<WebSocket | null>(null)
+  const [webSocket, setWebSocket] = useState<WebSocket | null>(null);
 
   useEffect(() => {
-    let webSocket = new WebSocket(`${import.meta.env.VITE_WS_API_URL}/ws`)
+    let webSocket = new WebSocket(`${import.meta.env.VITE_WS_API_URL}/ws`);
 
-    setWebSocket(webSocket)
+    setWebSocket(webSocket);
 
     function handleWebSocketOpen() {
-      console.log("Connected to the server")
+      console.log("Connected to the server");
 
       webSocket.send(JSON.stringify({
         type: "users_ids",
-      }))
+      }));
     }
 
     function handleWebSocketMessage(event: MessageEvent) {
-      console.log("Message from the server:", event.data)
+      console.log("Message from the server:", event.data);
 
-      const data = JSON.parse(event.data)
+      const data = JSON.parse(event.data);
 
       switch (data.type) {
         case "message": {
@@ -53,112 +54,112 @@ export function ChatPage() {
             setMessages((prevMessages) => [
               ...prevMessages,
               { owner: "receiver", content: data.message },
-            ])
+            ]);
           }
         } break;
 
         case "user_id": {
-          console.log("User ID:", data.user_id)
+          console.log("User ID:", data.user_id);
 
-          setUserId(data.user_id)
+          setUserId(data.user_id);
         } break;
 
         case "users_ids": {
-          console.log("User IDs:", data.users_ids)
+          console.log("User IDs:", data.users_ids);
 
-          setUsersIds(data.users_ids)
-          setCurrentActiveChatUserId(usersIds.find(uid => uid != userId) ?? "")
+          setUsersIds(data.users_ids);
+          setCurrentActiveChatUserId(usersIds.find(uid => uid != userId) ?? "");
         } break;
 
         case "another_user_connected": {
-          console.log("Another user connected:", data.user_id)
+          console.log("Another user connected:", data.user_id);
 
           setUsersIds((prevUsersIds) => [
             ...prevUsersIds,
             data.user_id,
-          ])
+          ]);
         } break;
 
         case "another_user_disconnected": {
-          console.log("Another user disconnected:", data.user_id)
+          console.log("Another user disconnected:", data.user_id);
 
-          setUsersIds((prevUsersIds) => prevUsersIds.filter((userId) => userId !== data.user_id))
+          setUsersIds((prevUsersIds) => prevUsersIds.filter((userId) => userId !== data.user_id));
         } break;
 
         case "all_messages": {
-          console.log("All messages:", data.messages)
+          console.log("All messages:", data.messages);
 
-          setMessages(data.messages)
+          setMessages(data.messages);
         } break;
 
         default: {
-          console.error("Unknown message type:", data.type)
+          console.error("Unknown message type:", data.type);
         }
       }
     }
 
     function handleWebSocketClose() {
-      console.log("Disconnected from the server")
+      console.log("Disconnected from the server");
     }
 
     function handleWebSocketError(error: Event) {
-      console.error("An error occurred:", error)
+      console.error("An error occurred:", error);
     }
 
-    webSocket.addEventListener("open", handleWebSocketOpen)
-    webSocket.addEventListener("message", handleWebSocketMessage)
-    webSocket.addEventListener("close", handleWebSocketClose)
-    webSocket.addEventListener("error", handleWebSocketError)
+    webSocket.addEventListener("open", handleWebSocketOpen);
+    webSocket.addEventListener("message", handleWebSocketMessage);
+    webSocket.addEventListener("close", handleWebSocketClose);
+    webSocket.addEventListener("error", handleWebSocketError);
 
     return () => {
-      webSocket.removeEventListener("open", handleWebSocketOpen)
-      webSocket.removeEventListener("message", handleWebSocketMessage)
-      webSocket.removeEventListener("close", handleWebSocketClose)
-      webSocket.removeEventListener("error", handleWebSocketError)
-      webSocket.close()
+      webSocket.removeEventListener("open", handleWebSocketOpen);
+      webSocket.removeEventListener("message", handleWebSocketMessage);
+      webSocket.removeEventListener("close", handleWebSocketClose);
+      webSocket.removeEventListener("error", handleWebSocketError);
+      webSocket.close();
     }
-  }, [])
+  }, []);
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
+    e.preventDefault();
 
     if (!currentMessage) {
-      return
+      return;
     }
 
     setMessages((prevMessages) => [
       ...prevMessages,
       { owner: "sender", content: currentMessage },
-    ])
+    ]);
 
-    setCurrentMessage("")
+    setCurrentMessage("");
 
     webSocket!.send(JSON.stringify({
       type: "message",
       message: currentMessage,
       receiver_id: currentActiveChatUserId,
-    }))
+    }));
   }
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === "Enter") {
-      e.preventDefault()
+      e.preventDefault();
     }
   }
 
   function handleUsersTableRowClick(e: React.MouseEvent, uid: string) {
-    e.preventDefault()
+    e.preventDefault();
 
     if (uid == userId) {
-      return
+      return;
     }
 
-    setCurrentActiveChatUserId(uid)
+    setCurrentActiveChatUserId(uid);
 
     webSocket!.send(JSON.stringify({
       type: "all_messages",
       receiver_id: uid,
-    }))
+    }));
   }
 
   return (
@@ -167,6 +168,7 @@ export function ChatPage() {
         <CardHeader>
           <CardTitle>Online Users</CardTitle>
         </CardHeader>
+
         <CardContent className="h-[100%]">
             <Table>
               <TableBody>
@@ -196,6 +198,7 @@ export function ChatPage() {
         <CardHeader className="border-b border-zinc-200">
           <CardTitle>Chat</CardTitle>
         </CardHeader>
+
         <CardContent className="p-0">
             <div className="space-y-4 overflow-auto max-h-[350px] h-[100%] p-4">
               {messages.length ? messages.map((message, index) => (
@@ -209,6 +212,7 @@ export function ChatPage() {
               )}
             </div>
         </CardContent>
+
         <CardFooter className="border-t border-zinc-200 p-4">
           <form onSubmit={handleSubmit} className="w-[100%] h-[100%] flex gap-4">
             <Input
@@ -219,15 +223,23 @@ export function ChatPage() {
               value={currentMessage}
             />
 
-            <Button
-              type="submit"
-              disabled={!currentActiveChatUserId}
-            >
-              Send
-            </Button>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span tabIndex={0}>
+                    <Button type="submit" disabled={!currentActiveChatUserId}>
+                      Send
+                    </Button>
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Select a user to chat with before sending a message</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </form>
         </CardFooter>
       </Card>
     </div>
-  )
+  );
 }
