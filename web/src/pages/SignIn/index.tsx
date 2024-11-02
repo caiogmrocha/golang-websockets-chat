@@ -19,8 +19,6 @@ export function SignInPage() {
 
   const navigate = useNavigate()
 
-  console.log(import.meta.env);
-
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault()
 
@@ -77,7 +75,8 @@ export function SignInPage() {
               </div>
             </div>
         </CardContent>
-        <CardFooter className="flex justify-end">
+        <CardFooter className="flex justify-end gap-4">
+          <Button type="button" variant="outline" onClick={() => navigate("/sign-up")}>Sign Up</Button>
           <Button type="submit">Sign In</Button>
         </CardFooter>
       </form>

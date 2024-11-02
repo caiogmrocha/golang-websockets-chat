@@ -17,7 +17,7 @@ interface MessageData {
   content: string
 }
 
-export function Chat() {
+export function ChatPage() {
   const [messages, setMessages] = useState<MessageData[]>([]);
 
   const [currentMessage, setCurrentMessage] = useState("")
