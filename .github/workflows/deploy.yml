@@ -62,6 +62,12 @@ jobs:
           docker tag websockets-chat-react ${{ secrets.DOCKERHUB_USERNAME }}/websockets-chat-react
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/websockets-chat-react
 
+      - name: Build websockets-chat-server
+        run: |
+          docker build -t websockets-chat-server -f ./docker/dockerfiles/dist/Dockerfile.server .
+          docker tag websockets-chat-server ${{ secrets.DOCKERHUB_USERNAME }}/websockets-chat-server
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/websockets-chat-server
+
       # - name: Build and push the Docker images
       #   run: |
       #     docker-compose -f docker-compose.prod.yml build
