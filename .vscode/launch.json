@@ -13,13 +13,22 @@
       "envFile": "${workspaceFolder}/server/.env"
     },
     {
-      "name": "Connect to server",
+      "name": "Connect to HTTP/WS API Server",
       "type": "go",
       "request": "attach",
       "mode": "remote",
       "remotePath": "/app",
       "port": 4040,
       "host": "localhost"
-    }
+    },
+    {
+      "name": "Connect to CRON Server",
+      "type": "go",
+      "request": "attach",
+      "mode": "remote",
+      "remotePath": "/app",
+      "port": 4041,
+      "host": "localhost"
+    },
   ]
 }
