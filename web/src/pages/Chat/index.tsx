@@ -200,7 +200,7 @@ export function ChatPage() {
                 ) : (
                   <TableRow key={user.id} onClick={(e) => handleUsersTableRowClick(e, user.id)}>
                     <TableCell className="font-medium cursor-pointer">
-                      🔴 {user.name}
+                      {currentActiveChatUserId === user.id ? "🔴" : ""} {user.name}
                     </TableCell>
                   </TableRow>
                 ))}
