@@ -14,6 +14,18 @@ services:
     depends_on:
       - websockets-chat-mongodb
 
+  websockets-chat-cron:
+    container_name: websockets-chat-cron
+    build:
+      context: ./server
+      dockerfile: ../docker/dockerfiles/dev/Dockerfile.cron
+    ports:
+      - "4041:4041"
+    environment:
+      MONGO_HOST: websockets-chat-mongodb
+    depends_on:
+      - websockets-chat-mongodb
+
   websockets-chat-mongodb:
     container_name: websockets-chat-mongodb
     image: mongo
