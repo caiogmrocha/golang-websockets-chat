@@ -2,9 +2,11 @@ package service
 
 import (
 	"errors"
+	"time"
 
 	"github.com/caiogmrocha/golang-websockets-chat/server/internal/app/interfaces/repository"
 	"github.com/caiogmrocha/golang-websockets-chat/server/internal/domain/entity"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type RegisterUserService struct {
@@ -29,9 +31,10 @@ func (service *RegisterUserService) Create(dto *RegisterUserServiceDTO) error {
 	}
 
 	user = &entity.User{
-		Name:     dto.Name,
-		Email:    dto.Email,
-		Password: dto.Password,
+		Name:          dto.Name,
+		Email:         dto.Email,
+		Password:      dto.Password,
+		LastLoginDate: primitive.NewDateTimeFromTime(time.Now()),
 	}
 
 	return service.UserRepository.Create(user)

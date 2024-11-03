@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/caiogmrocha/golang-websockets-chat/server/configs"
 	"github.com/caiogmrocha/golang-websockets-chat/server/internal/domain/entity"
@@ -107,6 +108,22 @@ func (repo *MongoUsersRepository) Create(user *entity.User) error {
 	coll := configs.MongoClient.Database(os.Getenv("MONGO_DB")).Collection("users")
 
 	_, err := coll.InsertOne(context.TODO(), user)
+
+	return err
+}
+
+func (repo *MongoUsersRepository) Update(user *entity.User) error {
+	coll := configs.MongoClient.Database(os.Getenv("MONGO_DB")).Collection("users")
+
+	_, err := coll.UpdateOne(context.TODO(), bson.M{"_id": user.ID}, bson.M{"$set": user})
+
+	return err
+}
+
+func (repo *MongoUsersRepository) DeleteInactiveUsers(bound time.Time) error {
+	coll := configs.MongoClient.Database(os.Getenv("MONGO_DB")).Collection("users")
+
+	_, err := coll.DeleteMany(context.TODO(), bson.M{"last_login_date": bson.M{"$lt": bound}})
 
 	return err
 }

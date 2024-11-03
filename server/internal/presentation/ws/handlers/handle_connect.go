@@ -10,7 +10,8 @@ import (
 )
 
 type ConnectHandler struct {
-	GetUserByIdService *service.GetUserByIdService
+	GetUserByIdService             *service.GetUserByIdService
+	UpdateUserLastLoginDateService *service.UpdateUserLastLoginDateService
 }
 
 func (h *ConnectHandler) HandleConnect(s *melody.Session, m *melody.Melody) {
@@ -28,6 +29,14 @@ func (h *ConnectHandler) HandleConnect(s *melody.Session, m *melody.Melody) {
 	s.Write(marshalledPayload)
 
 	user, err := h.GetUserByIdService.Get(userID.(string))
+
+	if err != nil {
+		log.Println(err)
+
+		return
+	}
+
+	err = h.UpdateUserLastLoginDateService.Update(userID.(string))
 
 	if err != nil {
 		log.Println(err)
@@ -53,8 +62,12 @@ func NewConnectHandler() *ConnectHandler {
 	getUserByIdService := service.GetUserByIdService{
 		UsersRepository: &usersRepository,
 	}
+	updateLastLoginDateService := service.UpdateUserLastLoginDateService{
+		UsersRepository: &usersRepository,
+	}
 
 	return &ConnectHandler{
-		GetUserByIdService: &getUserByIdService,
+		GetUserByIdService:             &getUserByIdService,
+		UpdateUserLastLoginDateService: &updateLastLoginDateService,
 	}
 }
