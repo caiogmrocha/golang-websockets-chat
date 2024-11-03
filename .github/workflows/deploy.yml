@@ -8,7 +8,6 @@ on:
 jobs:
   build:
     name: Build
-    # needs: install-docker
     runs-on: ubuntu-latest
     env:
       MONGO_HOST: ${{ secrets.MONGO_HOST }}
@@ -34,9 +33,6 @@ jobs:
           echo "ALLOWED_ORIGINS=${ALLOWED_ORIGINS}" >> ./server/.env
           echo "SECRET_KEY=${SECRET_KEY}" >> ./server/.env
 
-      - name: List the files
-        run: ls -la
-
       - name: Set up ./web environment variables
         run: |
           echo "VITE_HTTP_API_URL=${VITE_HTTP_API_URL}" >> ./web/.env
@@ -50,6 +46,7 @@ jobs:
           docker compose -f docker-compose.prod.yml build
           docker compose -f docker-compose.prod.yml push
   deploy:
+    name: Deploy
     needs: build
     runs-on: self-hosted
     steps:
@@ -67,7 +64,7 @@ jobs:
           curl -o docker-compose.prod.yml https://raw.githubusercontent.com/caiogmrocha/golang-websockets-chat/refs/heads/main/docker-compose.prod.yml
 
       - name: Prune the Docker system
-        run: sudo docker system prune -a -f
+        run: sudo docker system prune -a --volumes -f
 
       - name: Pull the Docker images
         run: sudo docker compose -f docker-compose.prod.yml pull
@@ -77,6 +74,3 @@ jobs:
 
       - name: Start the Docker containers
         run: sudo docker compose -f docker-compose.prod.yml up -d
-
-
-
