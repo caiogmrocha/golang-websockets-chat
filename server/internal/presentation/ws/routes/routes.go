@@ -8,7 +8,9 @@ import (
 )
 
 func SetWSHandlers(m *melody.Melody) {
-	m.HandleConnect(func(s *melody.Session) { ws_handlers.HandleConnect(s, m) })
+	connectionHandler := ws_handlers.NewConnectHandler()
+	m.HandleConnect(func(s *melody.Session) { connectionHandler.HandleConnect(s, m) })
+
 	m.HandleDisconnect(func(s *melody.Session) { ws_handlers.HandleDisconnect(s, m) })
 
 	m.HandleMessage(func(s *melody.Session, msg []byte) {
@@ -21,8 +23,10 @@ func SetWSHandlers(m *melody.Melody) {
 			UserMessageHandler := ws_handlers.NewUserMessageHandler()
 
 			UserMessageHandler.HandleMessage(s, m, payload)
-		case "users_ids":
-			ws_handlers.HandleGetUsersIds(s, m)
+		case "connected_users":
+			GetUsersHandler := ws_handlers.NewGetUsersHandler()
+
+			GetUsersHandler.HandleGetUsers(s, m, payload)
 		case "all_messages":
 			GetAllChatMessagesHandler := ws_handlers.NewGetAllChatMessagesHandler()
 

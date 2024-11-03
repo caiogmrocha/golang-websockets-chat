@@ -18,13 +18,18 @@ interface MessageData {
   content: string
 }
 
+type ConnectedUser = {
+  id: string
+  name: string
+}
+
 export function ChatPage() {
   const [messages, setMessages] = useState<MessageData[]>([]);
 
   const [currentMessage, setCurrentMessage] = useState("");
 
   const [userId, setUserId] = useState("");
-  const [usersIds, setUsersIds] = useState<string[]>([]);
+  const [connectedUsers, setConnectedUsers] = useState<ConnectedUser[]>([]);
 
   const [currentActiveChatUserId, setCurrentActiveChatUserId] = useState("");
 
@@ -39,7 +44,7 @@ export function ChatPage() {
       console.log("Connected to the server");
 
       webSocket.send(JSON.stringify({
-        type: "users_ids",
+        type: "connected_users",
       }));
     }
 
@@ -64,26 +69,26 @@ export function ChatPage() {
           setUserId(data.user_id);
         } break;
 
-        case "users_ids": {
-          console.log("User IDs:", data.users_ids);
+        case "connected_users": {
+          console.log("User IDs:", data.users);
 
-          setUsersIds(data.users_ids);
-          setCurrentActiveChatUserId(usersIds.find(uid => uid != userId) ?? "");
+          setConnectedUsers(data.users);
+          setCurrentActiveChatUserId(connectedUsers.find(user => user.id != userId)?.id ?? "");
         } break;
 
         case "another_user_connected": {
-          console.log("Another user connected:", data.user_id);
+          console.log("Another user connected:", data.user.id);
 
-          setUsersIds((prevUsersIds) => [
-            ...prevUsersIds,
-            data.user_id,
+          setConnectedUsers((prevConnectedUsers) => [
+            ...prevConnectedUsers,
+            data.user,
           ]);
         } break;
 
         case "another_user_disconnected": {
           console.log("Another user disconnected:", data.user_id);
 
-          setUsersIds((prevUsersIds) => prevUsersIds.filter((userId) => userId !== data.user_id));
+          setConnectedUsers((prevUsersIds) => prevUsersIds.filter((user) => user.id !== data.user_id));
         } break;
 
         case "all_messages": {
@@ -172,21 +177,32 @@ export function ChatPage() {
         <CardContent className="h-[100%]">
             <Table>
               <TableBody>
-                {usersIds.length === 0 ? (
+                {connectedUsers.length === 0 ? (
                   <TableRow className="border border-zinc-900">
                     <TableCell className="text-center">No users online</TableCell>
                   </TableRow>
                 ) : null}
 
-                {usersIds.sort(uid => uid == userId ? -1 : 1).map((uid) => (
-                  <TableRow key={uid} onClick={(e) => handleUsersTableRowClick(e, uid)}>
-                    <TableCell className={cn("font-medium", {
-                      "cursor-pointer": uid != userId,
-                      "cursor-not-allowed": uid == userId,
-                      "bg-zinc-300": uid == userId
-                    })}>
-                      {uid == currentActiveChatUserId ? "🔴" : null} {uid}
-                      </TableCell>
+              {connectedUsers.sort(user => user.id == userId ? -1 : 1).map((user) => user.id == userId ? (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <TableRow key={user.id} onClick={(e) => handleUsersTableRowClick(e, user.id)}>
+                        <TableCell className="font-medium cursor-not-allowed bg-zinc-300">
+                          {user.name}
+                          </TableCell>
+                      </TableRow>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>You can't chat with yourself</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+                ) : (
+                  <TableRow key={user.id} onClick={(e) => handleUsersTableRowClick(e, user.id)}>
+                    <TableCell className="font-medium cursor-pointer">
+                      🔴 {user.name}
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>

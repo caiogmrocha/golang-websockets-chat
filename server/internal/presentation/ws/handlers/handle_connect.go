@@ -4,10 +4,16 @@ import (
 	"encoding/json"
 	"log"
 
+	"github.com/caiogmrocha/golang-websockets-chat/server/internal/app/service"
+	infra_repository "github.com/caiogmrocha/golang-websockets-chat/server/internal/infra/repository"
 	"github.com/olahol/melody"
 )
 
-func HandleConnect(s *melody.Session, m *melody.Melody) {
+type ConnectHandler struct {
+	GetUserByIdService *service.GetUserByIdService
+}
+
+func (h *ConnectHandler) HandleConnect(s *melody.Session, m *melody.Melody) {
 	userID, _ := s.Get("user_id")
 
 	log.Println("Connected")
@@ -21,9 +27,17 @@ func HandleConnect(s *melody.Session, m *melody.Melody) {
 
 	s.Write(marshalledPayload)
 
+	user, err := h.GetUserByIdService.Get(userID.(string))
+
+	if err != nil {
+		log.Println(err)
+
+		return
+	}
+
 	marshalledPayload, _ = json.Marshal(map[string]interface{}{
-		"type":    "another_user_connected",
-		"user_id": userID,
+		"type": "another_user_connected",
+		"user": user,
 	})
 
 	m.BroadcastFilter(marshalledPayload, func(q *melody.Session) bool {
@@ -32,4 +46,15 @@ func HandleConnect(s *melody.Session, m *melody.Melody) {
 
 		return sId != qId
 	})
+}
+
+func NewConnectHandler() *ConnectHandler {
+	usersRepository := infra_repository.MongoUsersRepository{}
+	getUserByIdService := service.GetUserByIdService{
+		UsersRepository: &usersRepository,
+	}
+
+	return &ConnectHandler{
+		GetUserByIdService: &getUserByIdService,
+	}
 }
