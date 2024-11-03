@@ -24,8 +24,8 @@ services:
   websockets-chat-react:
     container_name: websockets-chat-react
     build:
-      context: .
-      dockerfile: ./docker/dockerfiles/dist/Dockerfile.react
+      context: ./web
+      dockerfile: ../docker/dockerfiles/dist/Dockerfile.react
     volumes:
       - react-build:/app/dist
 

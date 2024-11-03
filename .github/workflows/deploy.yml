@@ -17,6 +17,8 @@ jobs:
       MONGO_DB: ${{ secrets.MONGO_DB }}
       ALLOWED_ORIGINS: ${{ secrets.PRODUCTION_ALLOWED_ORIGIN }}
       SECRET_KEY: ${{ secrets.JWT_SECRET }}
+      VITE_HTTP_API_URL: ${{ secrets.PRODUCTION_HTTP_API_URL }}
+      VITE_WS_API_URL: ${{ secrets.PRODUCTION_WS_API_URL }}
     steps:
       - name: Checkout the files
         uses: actions/checkout@v4
@@ -24,7 +26,7 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
 
-      - name: Set up server environment variables
+      - name: Set up ./server environment variables
         run: |
           echo "MONGO_HOST=${MONGO_HOST}" >> .env
           echo "MONGO_PORT=${MONGO_PORT}" >> .env
@@ -33,6 +35,11 @@ jobs:
           echo "MONGO_DB=${MONGO_DB}" >> .env
           echo "ALLOWED_ORIGINS=${ALLOWED_ORIGINS}" >> .env
           echo "SECRET_KEY=${SECRET_KEY}" >> .env
+
+      - name: Set up ./web environment variables
+        run: |
+          echo "VITE_HTTP_API_URL=${VITE_HTTP_API_URL}" >> ./web/.env
+          echo "VITE_WS_API_URL=${VITE_WS_API_URL}" >> ./web/.env
 
       - name: Login to DockerHub
         run: docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" -p "${{ secrets.DOCKERHUB_PASSWORD }}"
@@ -48,6 +55,12 @@ jobs:
           docker build -t websockets-chat-cron -f ./docker/dockerfiles/dist/Dockerfile.cron ./server
           docker tag websockets-chat-cron ${{ secrets.DOCKERHUB_USERNAME }}/websockets-chat-cron
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/websockets-chat-cron
+
+      - name: Build websockets-chat-react
+        run: |
+          docker build -t websockets-chat-react -f ./docker/dockerfiles/dist/Dockerfile.react ./web
+          docker tag websockets-chat-react ${{ secrets.DOCKERHUB_USERNAME }}/websockets-chat-react
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/websockets-chat-react
 
       # - name: Build and push the Docker images
       #   run: |
