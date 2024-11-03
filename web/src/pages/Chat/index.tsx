@@ -10,7 +10,6 @@ import { Input } from "@/components/ui/input"
 import { Message } from "./message"
 import React, { useEffect, useState } from "react"
 import { Table, TableBody, TableCell, TableRow } from "../../components/ui/table"
-import { cn } from "@/lib/utils"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 interface MessageData {
