@@ -34,6 +34,9 @@ jobs:
           echo "ALLOWED_ORIGINS=${ALLOWED_ORIGINS}" >> .env
           echo "SECRET_KEY=${SECRET_KEY}" >> .env
 
+      - name: List the files
+        run: ls -la
+
       - name: Set up ./web environment variables
         run: |
           echo "VITE_HTTP_API_URL=${VITE_HTTP_API_URL}" >> ./web/.env
@@ -46,21 +49,34 @@ jobs:
         run: |
           docker compose -f docker-compose.prod.yml build
           docker compose -f docker-compose.prod.yml push
+  deploy:
+    needs: build
+    runs-on: self-hosted
+    steps:
+      - name: Create app directories
+        run: |
+          sudo mkdir -p /app/docker/volumes/mongodb
+          cd /app
 
-      # - name: SSH into EC2
-      #   uses: appleboy/ssh-action@master
-      #   with:
-      #     host: ${{ secrets.EC2_HOST }}
-      #     username: ${{ secrets.EC2_USERNAME }}
-      #     key: ${{ secrets.EC2_PRIVATE_KEY }}
-      #     script: |
-      #       cd /home/ubuntu/golang-websockets-chat
-      #       git pull
-      #       docker-compose -f docker-compose.prod.yml up -d
-  # deploy:
-  #   needs: build
-  #   runs-on: self-hosted
-  #   steps:
-  #     - name:
+      - name: Login to DockerHub
+        run: sudo docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" -p "${{ secrets.DOCKERHUB_PASSWORD }}"
+
+      - name: Download docker-compose.prod.yml
+        run: |
+          rm -f docker-compose.prod.yml
+          curl -o docker-compose.prod.yml https://raw.githubusercontent.com/caiogmrocha/golang-websockets-chat/refs/heads/main/docker-compose.prod.yml
+
+      - name: Prune the Docker system
+        run: sudo docker system prune -f
+
+      - name: Pull the Docker images
+        run: sudo docker compose -f docker-compose.prod.yml pull
+
+      - name: Stop the Docker containers
+        run: sudo docker compose -f docker-compose.prod.yml down
+
+      - name: Start the Docker containers
+        run: sudo docker compose -f docker-compose.prod.yml up -d
+
 
 
