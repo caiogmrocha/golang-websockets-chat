@@ -20,7 +20,7 @@ func (s *GetAllChatMessagesService) Get(senderID, receiverID string) ([]GetAllCh
 		return nil, err
 	}
 
-	var messagesDTO []GetAllChatMessagesServiceResponseDTO
+	messagesDTO := []GetAllChatMessagesServiceResponseDTO{}
 
 	var owner string
 

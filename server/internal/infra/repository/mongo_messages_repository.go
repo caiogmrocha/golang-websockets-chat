@@ -26,7 +26,7 @@ func (repo *MongoMessagesRepository) GetBySenderIdAndReceiverId(senderID, receiv
 		return nil, err
 	}
 
-	var messages []entity.Message
+	messages := []entity.Message{}
 
 	err = cursor.All(context.TODO(), &messages)
 
