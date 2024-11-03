@@ -44,34 +44,34 @@ jobs:
       - name: Login to DockerHub
         run: docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" -p "${{ secrets.DOCKERHUB_PASSWORD }}"
 
-      - name: Build websockets-chat-api
-        run: |
-          docker build -t websockets-chat-api -f ./docker/dockerfiles/dist/Dockerfile.api ./server
-          docker tag websockets-chat-api ${{ secrets.DOCKERHUB_USERNAME }}/websockets-chat-api
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/websockets-chat-api
-
-      - name: Build websockets-chat-cron
-        run: |
-          docker build -t websockets-chat-cron -f ./docker/dockerfiles/dist/Dockerfile.cron ./server
-          docker tag websockets-chat-cron ${{ secrets.DOCKERHUB_USERNAME }}/websockets-chat-cron
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/websockets-chat-cron
-
-      - name: Build websockets-chat-react
-        run: |
-          docker build -t websockets-chat-react -f ./docker/dockerfiles/dist/Dockerfile.react ./web
-          docker tag websockets-chat-react ${{ secrets.DOCKERHUB_USERNAME }}/websockets-chat-react
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/websockets-chat-react
-
-      - name: Build websockets-chat-server
-        run: |
-          docker build -t websockets-chat-server -f ./docker/dockerfiles/dist/Dockerfile.nginx .
-          docker tag websockets-chat-server ${{ secrets.DOCKERHUB_USERNAME }}/websockets-chat-server
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/websockets-chat-server
-
-      # - name: Build and push the Docker images
+      # - name: Build websockets-chat-api
       #   run: |
-      #     docker-compose -f docker-compose.prod.yml build
-      #     docker-compose -f docker-compose.prod.yml push
+      #     docker build -t websockets-chat-api -f ./docker/dockerfiles/dist/Dockerfile.api ./server
+      #     docker tag websockets-chat-api ${{ secrets.DOCKERHUB_USERNAME }}/websockets-chat-api
+      #     docker push ${{ secrets.DOCKERHUB_USERNAME }}/websockets-chat-api
+
+      # - name: Build websockets-chat-cron
+      #   run: |
+      #     docker build -t websockets-chat-cron -f ./docker/dockerfiles/dist/Dockerfile.cron ./server
+      #     docker tag websockets-chat-cron ${{ secrets.DOCKERHUB_USERNAME }}/websockets-chat-cron
+      #     docker push ${{ secrets.DOCKERHUB_USERNAME }}/websockets-chat-cron
+
+      # - name: Build websockets-chat-react
+      #   run: |
+      #     docker build -t websockets-chat-react -f ./docker/dockerfiles/dist/Dockerfile.react ./web
+      #     docker tag websockets-chat-react ${{ secrets.DOCKERHUB_USERNAME }}/websockets-chat-react
+      #     docker push ${{ secrets.DOCKERHUB_USERNAME }}/websockets-chat-react
+
+      # - name: Build websockets-chat-server
+      #   run: |
+      #     docker build -t websockets-chat-server -f ./docker/dockerfiles/dist/Dockerfile.nginx .
+      #     docker tag websockets-chat-server ${{ secrets.DOCKERHUB_USERNAME }}/websockets-chat-server
+      #     docker push ${{ secrets.DOCKERHUB_USERNAME }}/websockets-chat-server
+
+      - name: Build and push the Docker images
+        run: |
+          docker-compose -f docker-compose.prod.yml build
+          docker-compose -f docker-compose.prod.yml push
 
       # - name: SSH into EC2
       #   uses: appleboy/ssh-action@master
