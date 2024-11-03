@@ -64,7 +64,7 @@ jobs:
 
       - name: Build websockets-chat-server
         run: |
-          docker build -t websockets-chat-server -f ./docker/dockerfiles/dist/Dockerfile.server .
+          docker build -t websockets-chat-server -f ./docker/dockerfiles/dist/Dockerfile.nginx .
           docker tag websockets-chat-server ${{ secrets.DOCKERHUB_USERNAME }}/websockets-chat-server
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/websockets-chat-server
 

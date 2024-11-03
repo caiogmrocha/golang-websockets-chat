@@ -6,6 +6,7 @@ services:
     build:
       context: ./server
       dockerfile: ../docker/dockerfiles/dist/Dockerfile.api
+    image: caiogui/websockets-chat-api
     environment:
       MONGO_HOST: websockets-chat-mongodb
     depends_on:
@@ -16,6 +17,7 @@ services:
     build:
       context: ./server
       dockerfile: ../docker/dockerfiles/dist/Dockerfile.cron
+    image: caiogui/websockets-chat-cron
     environment:
       MONGO_HOST: websockets-chat-mongodb
     depends_on:
@@ -26,6 +28,7 @@ services:
     build:
       context: ./web
       dockerfile: ../docker/dockerfiles/dist/Dockerfile.react
+    image: caiogui/websockets-chat-react
     volumes:
       - react-build:/app/dist
 
@@ -34,6 +37,7 @@ services:
     build:
       context: .
       dockerfile: ./docker/dockerfiles/dist/Dockerfile.nginx
+    image: caiogui/websockets-chat-server
     ports:
       - "80:80"
       - "8080:8080"
