@@ -6,7 +6,7 @@ import (
 
 	"github.com/caiogmrocha/golang-websockets-chat/server/internal/app/interfaces/jwt"
 	"github.com/caiogmrocha/golang-websockets-chat/server/internal/app/interfaces/repository"
-	"github.com/caiogmrocha/golang-websockets-chat/server/internal/utils"
+	"github.com/caiogmrocha/golang-websockets-chat/server/pkg/utils"
 	"golang.org/x/crypto/bcrypt"
 )
 
