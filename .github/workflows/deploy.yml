@@ -63,6 +63,15 @@ jobs:
           rm -f docker-compose.prod.yml
           curl -o docker-compose.prod.yml https://raw.githubusercontent.com/caiogmrocha/golang-websockets-chat/refs/heads/main/docker-compose.prod.yml
 
+      - name: Stop all Docker containers
+        run: sudo docker stop $(sudo docker ps -aq)
+
+      - name: Remove all Docker containers
+        run: sudo docker rm $(sudo docker ps -aq)
+
+      - name: Remove the Docker volumes
+        run: sudo docker volume rm $(sudo docker volume ls -q) -f
+
       - name: Prune the Docker system
         run: sudo docker system prune -a --volumes -f
 
