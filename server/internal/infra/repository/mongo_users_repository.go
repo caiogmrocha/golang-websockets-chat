@@ -2,7 +2,6 @@ package infra_repository
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"time"
 
@@ -43,15 +42,7 @@ func (repo *MongoUsersRepository) GetByID(id string) (*entity.User, error) {
 
 	var user entity.User
 
-	fmt.Print("Aquele ID lascado: ")
-	fmt.Println(id)
-
 	err = coll.FindOne(context.TODO(), bson.M{"_id": objectID}).Decode(&user)
-
-	fmt.Print("Aquele erro lascado: ")
-	fmt.Println(err)
-	fmt.Print("Aquele user lascado: ")
-	fmt.Println(user)
 
 	if err != nil {
 		if err.Error() == "mongo: no documents in result" {

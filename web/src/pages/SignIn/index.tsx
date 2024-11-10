@@ -23,8 +23,6 @@ export function SignInPage() {
 
   const authContext = useAuth();
 
-  console.log(authContext.isAuthenticated);
-
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
 

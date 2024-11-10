@@ -40,16 +40,12 @@ export function ChatPage() {
     setWebSocket(webSocket);
 
     function handleWebSocketOpen() {
-      console.log("Connected to the server");
-
       webSocket.send(JSON.stringify({
         type: "connected_users",
       }));
     }
 
     function handleWebSocketMessage(event: MessageEvent) {
-      console.log("Message from the server:", event.data);
-
       const data = JSON.parse(event.data);
 
       switch (data.type) {
@@ -63,21 +59,15 @@ export function ChatPage() {
         } break;
 
         case "user_id": {
-          console.log("User ID:", data.user_id);
-
           setUserId(data.user_id);
         } break;
 
         case "connected_users": {
-          console.log("User IDs:", data.users);
-
           setConnectedUsers(data.users);
           setCurrentActiveChatUserId(connectedUsers.find(user => user.id != userId)?.id ?? "");
         } break;
 
         case "another_user_connected": {
-          console.log("Another user connected:", data.user.id);
-
           setConnectedUsers((prevConnectedUsers) => [
             ...prevConnectedUsers,
             data.user,
@@ -85,14 +75,10 @@ export function ChatPage() {
         } break;
 
         case "another_user_disconnected": {
-          console.log("Another user disconnected:", data.user_id);
-
           setConnectedUsers((prevUsersIds) => prevUsersIds.filter((user) => user.id !== data.user_id));
         } break;
 
         case "all_messages": {
-          console.log("All messages:", data.messages);
-
           setMessages(data.messages);
         } break;
 
