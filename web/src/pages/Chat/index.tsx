@@ -134,6 +134,22 @@ export function ChatPage() {
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === "Enter") {
       e.preventDefault();
+
+      if (!currentMessage) {
+        return;
+      }
+
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { owner: "sender", content: currentMessage },
+      ]);
+      setCurrentMessage("");
+
+      webSocket!.send(JSON.stringify({
+        type: "message",
+        message: currentMessage,
+        receiver_id: currentActiveChatUserId,
+      }));
     }
   }
 
